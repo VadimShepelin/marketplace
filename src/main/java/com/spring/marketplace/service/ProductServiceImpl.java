@@ -32,12 +32,13 @@ public class ProductServiceImpl implements ProductService<UUID, ProductDto> {
 
     @Override
     public void saveProduct(ProductDto product) {
-
     }
 
     @Override
     public void deleteProduct(UUID id) {
-
+        productRepository.findById(id)
+                .ifPresentOrElse(item -> productRepository.deleteById(item.getId()),
+                        () -> {throw new NoSuchProductException("Can't find product with id: " + id);});
     }
 
     @Autowired
