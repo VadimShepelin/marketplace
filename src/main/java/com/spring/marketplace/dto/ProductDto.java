@@ -29,7 +29,7 @@ public class ProductDto {
     @NotBlank(message = "Name must be not empty")
     private String name;
 
-    @NotBlank
+    @NotBlank(message = "Description must be not empty")
     @Size(min = 10, message = "Description length min 10 chars")
     private String description;
 
