@@ -2,7 +2,7 @@ package com.spring.marketplace.utils.converter;
 
 
 import com.spring.marketplace.dto.ProductDto;
-import com.spring.marketplace.model.entity.Product;
+import com.spring.marketplace.model.Product;
 import com.spring.marketplace.utils.factory.AbstractFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

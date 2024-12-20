@@ -10,7 +10,9 @@ public interface ProductService<Uuid, ProductDto> {
 
     ProductDto getProduct(Uuid id);
 
-    void saveProduct(ProductDto product);
+    ProductDto saveProduct(ProductDto product);
 
     void deleteProduct(Uuid id);
+
+    ProductDto updateProduct(ProductDto product);
 }

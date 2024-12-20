@@ -1,9 +1,9 @@
-package com.spring.marketplace.model.entity;
+package com.spring.marketplace.model;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.spring.marketplace.model.enums.Categories;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.ToString;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.AccessLevel;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import java.math.BigInteger;
@@ -30,12 +31,12 @@ import java.util.UUID;
 public class Product {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id")
     private UUID id;
 
     @Column(name="name")
-    @NotBlank
     private String name;
 
     @Column(name = "description")
@@ -53,12 +54,11 @@ public class Product {
     private BigInteger quantity;
 
     @Column(name = "sku")
-    @NotBlank
     private String sku;
 
     @Column(name = "created_at")
     private Instant createdAt;
 
     @Column(name = "quantity_update")
-    private LocalDateTime updated_at;
+    private LocalDateTime updatedAt;
 }

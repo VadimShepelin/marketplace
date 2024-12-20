@@ -4,9 +4,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @Getter
-@Setter
 @NoArgsConstructor
 public class ProductIncorrectData {
-    private String info;
+    private List<String> info = new ArrayList<String>();
+
+    public void setInfo(String... messages) {
+        this.info.addAll(Arrays.asList(messages));
+    }
+
 }

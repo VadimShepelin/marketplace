@@ -1,7 +1,7 @@
 package com.spring.marketplace.utils.factory;
 
 import com.spring.marketplace.dto.ProductDto;
-import com.spring.marketplace.model.entity.Product;
+import com.spring.marketplace.model.Product;
 
 public abstract class AbstractFactory {
 

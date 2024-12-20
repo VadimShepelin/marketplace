@@ -1,8 +1,8 @@
 package com.spring.marketplace.utils.factory;
 
 import com.spring.marketplace.dto.ProductDto;
-import com.spring.marketplace.model.entity.Product;
-import com.spring.marketplace.model.enums.Categories;
+import com.spring.marketplace.model.Product;
+import com.spring.marketplace.model.Categories;
 
 
 public class ProductFactory extends AbstractFactory{
@@ -17,7 +17,7 @@ public class ProductFactory extends AbstractFactory{
                     .createdAt(productDto.getCreatedAt())
                     .sku(productDto.getSku())
                     .createdAt(productDto.getCreatedAt())
-                    .updated_at(productDto.getUpdated_at())
+                    .updatedAt(productDto.getUpdated_at())
                     .quantity(productDto.getQuantity())
                     .category(Enum.valueOf(Categories.class,productDto.getCategory()))
                     .build();

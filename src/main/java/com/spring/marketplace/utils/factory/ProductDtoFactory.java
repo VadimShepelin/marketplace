@@ -1,7 +1,7 @@
 package com.spring.marketplace.utils.factory;
 
 import com.spring.marketplace.dto.ProductDto;
-import com.spring.marketplace.model.entity.Product;
+import com.spring.marketplace.model.Product;
 
 public class ProductDtoFactory extends AbstractFactory{
 
@@ -16,7 +16,7 @@ public class ProductDtoFactory extends AbstractFactory{
                 .quantity(product.getQuantity())
                 .category(String.valueOf(product.getCategory()))
                 .sku(product.getSku())
-                .updated_at(product.getUpdated_at())
+                .updated_at(product.getUpdatedAt())
                 .build();
     }
 }
