@@ -11,12 +11,8 @@ import lombok.Getter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.AccessLevel;
-import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
-
 import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDateTime;

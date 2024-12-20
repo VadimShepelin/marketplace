@@ -1,6 +1,6 @@
 package com.spring.marketplace.utils.converter;
 
-
+import com.spring.marketplace.dto.ProductDto;
 import com.spring.marketplace.model.entity.Product;
 import com.spring.marketplace.utils.factory.AbstractFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,20 +8,19 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
+
 @Component
-public class DtoToEntityConverter implements Converter<Object, Product> {
+public class EntityToProductDtoConverter implements Converter<Product, ProductDto> {
 
     private final AbstractFactory abstractFactory;
 
     @Override
-    public Product convert(Object source) {
-
-        return abstractFactory.createProduct(source);
+    public ProductDto convert(Product source) {
+        return abstractFactory.createProductReadDto(source);
     }
 
     @Autowired
-    public DtoToEntityConverter(@Qualifier("getDtoFactory") AbstractFactory abstractFactory) {
-
+    public EntityToProductDtoConverter(@Qualifier("getProductFactory") AbstractFactory abstractFactory) {
         this.abstractFactory = abstractFactory;
     }
 }

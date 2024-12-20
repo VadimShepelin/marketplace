@@ -1,36 +1,37 @@
 package com.spring.marketplace.service;
 
-import com.spring.marketplace.dto.ProductReadDto;
+import com.spring.marketplace.dto.ProductDto;
+import com.spring.marketplace.exception.NoSuchProductException;
 import com.spring.marketplace.repository.ProductRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class ProductServiceImpl implements ProductService<UUID, ProductReadDto> {
+public class ProductServiceImpl implements ProductService<UUID, ProductDto> {
 
     private final ProductRepository productRepository;
     private final ConversionService conversionService;
 
     @Override
-    public List<ProductReadDto> getProducts() {
+    public List<ProductDto> getProducts() {
        return productRepository.findAll().stream()
-                .map(item -> conversionService.convert(item, ProductReadDto.class))
+                .map(item -> conversionService.convert(item, ProductDto.class))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<ProductReadDto> getProduct(UUID id) {
-        return Optional.empty();
+    public ProductDto getProduct(UUID id) {
+         return productRepository.findById(id)
+                 .map(item->conversionService.convert(item,ProductDto.class))
+                 .orElseThrow(() -> new NoSuchProductException("Can't find product with id: " + id));
     }
 
     @Override
-    public void saveProduct(ProductReadDto product) {
+    public void saveProduct(ProductDto product) {
 
     }
 

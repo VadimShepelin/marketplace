@@ -1,10 +1,9 @@
 package com.spring.marketplace.config;
 
-import com.spring.marketplace.model.entity.Product;
-import com.spring.marketplace.utils.converter.DtoToEntityConverter;
-import com.spring.marketplace.utils.converter.EntityToDtoConverter;
+import com.spring.marketplace.utils.converter.ProductDtoToEntityConverter;
+import com.spring.marketplace.utils.converter.EntityToProductDtoConverter;
 import com.spring.marketplace.utils.factory.AbstractFactory;
-import com.spring.marketplace.utils.factory.DtoFactory;
+import com.spring.marketplace.utils.factory.ProductDtoFactory;
 import com.spring.marketplace.utils.factory.ProductFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,13 +15,13 @@ public class WebConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
-        registry.addConverter(new DtoToEntityConverter(getProductFactory()));
-        registry.addConverter(new EntityToDtoConverter(getDtoFactory()));
+        registry.addConverter(new ProductDtoToEntityConverter(getProductFactory()));
+        registry.addConverter(new EntityToProductDtoConverter(getDtoFactory()));
     }
 
     @Bean
     public AbstractFactory getDtoFactory(){
-        return new DtoFactory();
+        return new ProductDtoFactory();
     }
 
     @Bean

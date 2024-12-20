@@ -1,15 +1,15 @@
 package com.spring.marketplace.utils.factory;
 
-import com.spring.marketplace.dto.ProductReadDto;
+import com.spring.marketplace.dto.ProductDto;
 import com.spring.marketplace.model.entity.Product;
 
 public abstract class AbstractFactory {
 
-    public Product createProduct(Object object){
+    public Product createProduct(ProductDto productDto){
         return null;
     }
 
-    public ProductReadDto createProductReadDto(Product product){
+    public ProductDto createProductReadDto(Product product){
         return null;
     }
 

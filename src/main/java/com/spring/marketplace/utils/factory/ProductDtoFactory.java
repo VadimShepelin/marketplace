@@ -1,13 +1,13 @@
 package com.spring.marketplace.utils.factory;
 
-import com.spring.marketplace.dto.ProductReadDto;
+import com.spring.marketplace.dto.ProductDto;
 import com.spring.marketplace.model.entity.Product;
 
-public class DtoFactory extends AbstractFactory{
+public class ProductDtoFactory extends AbstractFactory{
 
     @Override
-    public ProductReadDto createProductReadDto(Product product) {
-        return ProductReadDto.builder()
+    public ProductDto createProductReadDto(Product product) {
+        return ProductDto.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .price(product.getPrice())

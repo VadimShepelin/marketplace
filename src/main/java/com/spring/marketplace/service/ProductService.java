@@ -1,17 +1,16 @@
 package com.spring.marketplace.service;
 
-import com.spring.marketplace.dto.ProductReadDto;
+
 
 import java.util.List;
-import java.util.Optional;
 
-public interface ProductService<Uuid, ProductResponseDto> {
+public interface ProductService<Uuid, ProductDto> {
 
-    List<ProductResponseDto> getProducts();
+    List<ProductDto> getProducts();
 
-    Optional<ProductResponseDto> getProduct(Uuid id);
+    ProductDto getProduct(Uuid id);
 
-    void saveProduct(ProductReadDto product);
+    void saveProduct(ProductDto product);
 
     void deleteProduct(Uuid id);
 }

@@ -1,7 +1,6 @@
 package com.spring.marketplace.dto;
 
 
-import com.spring.marketplace.model.enums.Categories;
 import lombok.*;
 
 import java.math.BigInteger;
@@ -15,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Builder
-public class ProductReadDto {
+public class ProductDto {
 
     private UUID id;
 
