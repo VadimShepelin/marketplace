@@ -4,12 +4,17 @@ package com.spring.marketplace.dto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-
 import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Builder;
 
 @ToString(exclude = "category")
 @EqualsAndHashCode(of = "id")

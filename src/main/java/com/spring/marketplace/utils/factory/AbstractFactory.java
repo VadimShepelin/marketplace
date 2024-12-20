@@ -9,7 +9,7 @@ public abstract class AbstractFactory {
         return null;
     }
 
-    public ProductDto createProductReadDto(Product product){
+    public ProductDto createProductDto(Product product){
         return null;
     }
 

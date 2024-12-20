@@ -16,11 +16,11 @@ public class WebConfiguration implements WebMvcConfigurer {
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(new ProductDtoToEntityConverter(getProductFactory()));
-        registry.addConverter(new EntityToProductDtoConverter(getDtoFactory()));
+        registry.addConverter(new EntityToProductDtoConverter(getProductDtoFactory()));
     }
 
     @Bean
-    public AbstractFactory getDtoFactory(){
+    public AbstractFactory getProductDtoFactory(){
         return new ProductDtoFactory();
     }
 

@@ -21,7 +21,7 @@ public class ProductDtoToEntityConverter implements Converter<ProductDto, Produc
     }
 
     @Autowired
-    public ProductDtoToEntityConverter(@Qualifier("getDtoFactory") AbstractFactory abstractFactory) {
+    public ProductDtoToEntityConverter(@Qualifier("getProductDtoFactory") AbstractFactory abstractFactory) {
 
         this.abstractFactory = abstractFactory;
     }

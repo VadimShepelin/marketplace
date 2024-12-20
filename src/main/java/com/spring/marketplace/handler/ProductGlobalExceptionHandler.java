@@ -1,6 +1,6 @@
 package com.spring.marketplace.handler;
 
-import com.spring.marketplace.exception.*;
+import com.spring.marketplace.exception.ProductIncorrectData;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

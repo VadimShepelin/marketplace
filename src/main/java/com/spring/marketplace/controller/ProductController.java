@@ -4,18 +4,22 @@ import com.spring.marketplace.dto.ProductDto;
 import com.spring.marketplace.exception.ConstraintValidationException;
 import com.spring.marketplace.exception.ProductAlreadyExistsException;
 import com.spring.marketplace.exception.ProductDontHaveIdException;
-import com.spring.marketplace.repository.ProductRepository;
 import com.spring.marketplace.service.ProductService;
 import jakarta.validation.Valid;
-import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/products")
@@ -42,10 +46,10 @@ public class ProductController {
     @PostMapping
     public ProductDto createProduct(@Valid @RequestBody  ProductDto productDto, BindingResult bindingResult) {
       if (bindingResult.hasErrors()) {
-          String allErrors = bindingResult.getAllErrors().stream().
+          String allErrorsMessages = bindingResult.getAllErrors().stream().
                   map((item) -> item.getDefaultMessage())
                   .collect(Collectors.joining(", "));
-          throw new ConstraintValidationException(allErrors);
+          throw new ConstraintValidationException(allErrorsMessages);
       }
 
       if(productDto.getId() != null) {
@@ -58,21 +62,21 @@ public class ProductController {
     @PutMapping
     public ProductDto updateProduct(@Valid @RequestBody ProductDto productDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            String allErrors = bindingResult.getAllErrors().stream().
+            String allErrorsMessages = bindingResult.getAllErrors().stream().
                     map((item) -> item.getDefaultMessage())
                     .collect(Collectors.joining(", "));
-            throw new ConstraintValidationException(allErrors);
+            throw new ConstraintValidationException(allErrorsMessages);
         }
 
         if(productDto.getId()==null){
-            throw new ProductDontHaveIdException("Product dont have id");
+            throw new ProductDontHaveIdException("Product doesn't have id");
         }
 
         return (ProductDto) productService.updateProduct(productDto);
     }
 
     @Autowired
-    public ProductController(ProductService productService, ProductRepository productRepository) {
+    public ProductController(ProductService productService) {
         this.productService = productService;
     }
 }

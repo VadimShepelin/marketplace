@@ -6,7 +6,7 @@ import com.spring.marketplace.model.Product;
 public class ProductDtoFactory extends AbstractFactory{
 
     @Override
-    public ProductDto createProductReadDto(Product product) {
+    public ProductDto createProductDto(Product product) {
         return ProductDto.builder()
                 .id(product.getId())
                 .name(product.getName())

@@ -16,7 +16,7 @@ public class EntityToProductDtoConverter implements Converter<Product, ProductDt
 
     @Override
     public ProductDto convert(Product source) {
-        return abstractFactory.createProductReadDto(source);
+        return abstractFactory.createProductDto(source);
     }
 
     @Autowired
