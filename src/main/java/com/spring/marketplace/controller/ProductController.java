@@ -1,10 +1,9 @@
 package com.spring.marketplace.controller;
 
 import com.spring.marketplace.dto.ProductDto;
-import com.spring.marketplace.exception.ApplicationException;
 import com.spring.marketplace.service.ProductService;
 import jakarta.validation.Valid;
-import lombok.SneakyThrows;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +19,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/products")
+@RequiredArgsConstructor(onConstructor_ = {@Autowired})
 public class ProductController {
 
     private final ProductService productService;
@@ -41,7 +41,6 @@ public class ProductController {
     }
 
     @PostMapping
-    @SneakyThrows
     public ProductDto createProduct(@Valid @RequestBody ProductDto productDto) {
        return productService.saveProduct(productDto);
     }
@@ -51,8 +50,4 @@ public class ProductController {
         return productService.updateProduct(productDto);
     }
 
-    @Autowired
-    public ProductController(ProductService productService) {
-        this.productService = productService;
-    }
 }

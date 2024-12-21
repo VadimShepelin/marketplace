@@ -1,7 +1,5 @@
 package com.spring.marketplace.exception;
 
-import java.util.EnumMap;
-import java.util.Map;
 
 public class ApplicationException extends RuntimeException {
     private final ErrorType errorType;

@@ -4,6 +4,7 @@ package com.spring.marketplace.dto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.util.UUID;
@@ -36,7 +37,7 @@ public class ProductDto {
     private String category;
 
     @Min(value = 100, message = "Min price is 100")
-    private double price;
+    private BigDecimal price;
 
     private BigInteger quantity;
 

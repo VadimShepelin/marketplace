@@ -16,9 +16,9 @@ import lombok.AccessLevel;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 
@@ -50,7 +50,7 @@ public class Product {
     private Categories category;
 
     @Column(name = "price")
-    private double price;
+    private BigDecimal price;
 
     @Column(name = "quantity")
     private BigInteger quantity;

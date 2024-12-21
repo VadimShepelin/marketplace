@@ -4,7 +4,7 @@
 create table products
 (
     id              uuid PRIMARY KEY,
-    name            text                  not null,
+    name            varchar(64)                  not null,
     description     text                  not null,
     price           numeric not null check (price > 99),
     quantity        bigint,
