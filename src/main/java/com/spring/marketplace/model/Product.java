@@ -62,5 +62,5 @@ public class Product {
     private Instant createdAt;
 
     @Column(name = "quantity_update")
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 }

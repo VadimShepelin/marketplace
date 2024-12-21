@@ -2,7 +2,9 @@ package com.spring.marketplace.utils.factory;
 
 import com.spring.marketplace.dto.ProductDto;
 import com.spring.marketplace.model.Product;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ProductDtoFactory extends AbstractFactory{
 
     @Override

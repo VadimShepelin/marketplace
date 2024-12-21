@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.math.BigInteger;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -46,5 +45,5 @@ public class ProductDto {
 
     private Instant createdAt;
 
-    private LocalDateTime updated_at;
+    private Instant updated_at;
 }
