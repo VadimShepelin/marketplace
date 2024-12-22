@@ -4,40 +4,47 @@ import com.spring.marketplace.dto.ProductDto;
 import com.spring.marketplace.exception.ApplicationException;
 import com.spring.marketplace.model.Product;
 import com.spring.marketplace.repository.ProductRepository;
+import com.spring.marketplace.utils.enums.ErrorType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired})
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final ConversionService conversionService;
 
     @Override
-    public List<ProductDto> getProducts() {
-        List<ProductDto> allProductsList = productRepository.findAll().stream()
-                .map(item -> conversionService.convert(item, ProductDto.class))
-                .collect(Collectors.toList());
-        log.info("All products list: {}", allProductsList);
+    @Transactional(readOnly = true)
+    public List<ProductDto> getAllProducts() {
+        List<Product> allProductsList = productRepository.findAll();
+        if (allProductsList.isEmpty()) {
+            log.info("No products found");
+            throw new ApplicationException(ErrorType.NO_PRODUCTS_FOUND);
+        }
 
-        return allProductsList;
+        log.info("All products list: {}", allProductsList);
+        return allProductsList.stream().
+                map((item) -> conversionService.convert(item, ProductDto.class))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public ProductDto getProduct(UUID id) {
+    @Transactional(readOnly = true)
+    public ProductDto getProductById(UUID id) {
         ProductDto product = productRepository.findById(id)
                 .map(item -> conversionService.convert(item, ProductDto.class))
                 .orElseThrow(() -> {
                     log.error("Product with id {} not found", id);
-                    return new ApplicationException(ApplicationException.ErrorType.PRODUCT_NOT_FOUND);
+                    return new ApplicationException(ErrorType.PRODUCT_NOT_FOUND);
                 });
         log.info("Product found: {}", product);
 
@@ -45,6 +52,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public ProductDto saveProduct(ProductDto product) {
         Product productEntity = conversionService.convert(product, Product.class);
         ProductDto productDto = conversionService.convert(productRepository.save(productEntity), ProductDto.class);
@@ -54,20 +62,29 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public void deleteProduct(UUID id) {
         productRepository.findById(id)
                 .ifPresentOrElse(item -> productRepository.deleteById(item.getId()),
                         () -> {
                     log.error("Product with id {} was not deleted", id);
-                    throw new ApplicationException(ApplicationException.ErrorType.PRODUCT_NOT_FOUND);});
+                    throw new ApplicationException(ErrorType.PRODUCT_NOT_FOUND);});
         log.info("Product with id {} deleted", id);
     }
 
     @Override
+    @Transactional
     public ProductDto updateProduct(ProductDto product) {
-        Product updatedProduct = productRepository.save(conversionService.convert(product, Product.class));
-        log.info("Product updated with success: {}", updatedProduct);
+       productRepository.findById(product.getId())
+                .ifPresentOrElse(item -> {
+                            log.info("Product with id {} updated", product.getId());
+                            productRepository.save(conversionService.convert(product, Product.class));
+                        },
+                        () -> {
+                            log.error("Product dont exists");
+                            throw new ApplicationException(ErrorType.PRODUCT_DONT_EXISTS);
+                        });
 
-        return conversionService.convert(updatedProduct,ProductDto.class);
+       return conversionService.convert(product,ProductDto.class);
     }
 }

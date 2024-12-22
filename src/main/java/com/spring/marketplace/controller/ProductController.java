@@ -4,7 +4,6 @@ import com.spring.marketplace.dto.ProductDto;
 import com.spring.marketplace.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,19 +18,19 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/products")
-@RequiredArgsConstructor(onConstructor_ = {@Autowired})
+@RequiredArgsConstructor
 public class ProductController {
 
     private final ProductService productService;
 
     @GetMapping
     public List<ProductDto> getAllProducts() {
-        return productService.getProducts();
+        return productService.getAllProducts();
     }
 
     @GetMapping("/{id}")
     public ProductDto getProductById(@PathVariable UUID id) {
-        return productService.getProduct(id);
+        return productService.getProductById(id);
     }
 
     @DeleteMapping("/{id}")

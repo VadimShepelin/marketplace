@@ -13,3 +13,4 @@ create table products
     quantity_update date,
     category        categories
 );
+

@@ -1,23 +1,10 @@
 package com.spring.marketplace.exception;
 
 
+import com.spring.marketplace.utils.enums.ErrorType;
+
 public class ApplicationException extends RuntimeException {
     private final ErrorType errorType;
-
-    public enum ErrorType {
-        PRODUCT_NOT_FOUND("No such product"),
-        PRODUCT_ALREADY_EXISTS("Product already exists");
-        private final String message;
-
-        ErrorType(String message) {
-            this.message = message;
-        };
-
-
-        public String getMessage() {
-            return message;
-        }
-    }
 
     public ApplicationException(ErrorType errorType) {
         super(errorType.getMessage());
