@@ -8,6 +8,8 @@ import com.spring.marketplace.utils.enums.ErrorType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -24,15 +26,15 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProductDto> getAllProducts() {
-        List<Product> allProductsList = productRepository.findAll();
-        if (allProductsList.isEmpty()) {
+    public List<ProductDto> getAllProducts(int pageNo, int pageSize) {
+        Page<Product> allProducts = productRepository.findAll(PageRequest.of(pageNo,pageSize));
+        if (allProducts.isEmpty()) {
             log.info("No products found");
             throw new ApplicationException(ErrorType.NO_PRODUCTS_FOUND);
         }
 
-        log.info("All products list: {}", allProductsList);
-        return allProductsList.stream().
+        log.info("All products list: {}", allProducts);
+        return allProducts.stream().
                 map((item) -> conversionService.convert(item, ProductDto.class))
                 .collect(Collectors.toList());
     }
