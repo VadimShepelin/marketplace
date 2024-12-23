@@ -1,10 +1,6 @@
 package com.spring.marketplace.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.ToString;
 import lombok.EqualsAndHashCode;
@@ -14,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.AccessLevel;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import java.math.BigDecimal;
@@ -46,7 +43,7 @@ public class Product {
     private String description;
 
     @Column(name = "category")
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Enumerated(EnumType.STRING)
     private Categories category;
 
     @Column(name = "price")

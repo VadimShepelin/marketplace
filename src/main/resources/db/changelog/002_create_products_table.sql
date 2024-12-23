@@ -8,7 +8,7 @@ create table products
     description     text                  not null,
     price           numeric not null check (price > 99),
     quantity        bigint,
-    sku             character varying(32) not null,
+    sku             character varying(32) not null unique,
     created_at      date,
     quantity_update date,
     category        categories

@@ -3,7 +3,9 @@ spring.application.name: marketplace
 spring.datasource:
   password: ILin47gim
   username: postgres
-  url: jdbc:postgresql://localhost:5432/marketplace
+  url: jdbc:postgresql://localhost:5432/marketplace?stringtype=unspecified
   driver-class-name: org.postgresql.Driver
 
 server.port: 8081
+
+
