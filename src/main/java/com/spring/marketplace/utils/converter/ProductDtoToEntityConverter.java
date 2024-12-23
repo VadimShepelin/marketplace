@@ -22,7 +22,7 @@ public class ProductDtoToEntityConverter implements Converter<ProductDto, Produc
                 .createdAt(productDto.getCreatedAt())
                 .updatedAt(productDto.getUpdated_at())
                 .quantity(productDto.getQuantity())
-                .category(Enum.valueOf(Categories.class,productDto.getCategory()))
+                .category(productDto.getCategory())
                 .build();
     }
 

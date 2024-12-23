@@ -1,8 +1,10 @@
 package com.spring.marketplace.dto;
 
 
+import com.spring.marketplace.model.Categories;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -33,8 +35,8 @@ public class ProductDto {
     @Size(min = 10, message = "Description length min 10 chars")
     private String description;
 
-    @NotBlank(message = "Category must be not empty")
-    private String category;
+    @NotNull(message = "Category must be not empty")
+    private Categories category;
 
     @Min(value = 100, message = "Min price is 100")
     private BigDecimal price;
