@@ -8,13 +8,13 @@ import com.spring.marketplace.utils.enums.ErrorType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.data.domain.Page;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -27,16 +27,16 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public List<ProductDto> getAllProducts(int pageNo, int pageSize) {
-        Page<Product> allProducts = productRepository.findAll(PageRequest.of(pageNo,pageSize));
-        if (allProducts.isEmpty()) {
-            log.info("No products found");
-            throw new ApplicationException(ErrorType.NO_PRODUCTS_FOUND);
-        }
-
-        log.info("All products list: {}", allProducts);
-        return allProducts.stream().
-                map((item) -> conversionService.convert(item, ProductDto.class))
-                .collect(Collectors.toList());
+        return Optional.of(productRepository.findAll(PageRequest.of(pageNo, pageSize)))
+                .filter((item)->(!item.isEmpty()))
+                .map(page -> {
+                    log.info("Find all the products from page {}", page.getNumber());
+                    return page.map(product -> conversionService.convert(product, ProductDto.class)).stream().toList();
+                })
+                .orElseThrow(() -> {
+                    log.error("No products found");
+                    return new ApplicationException(ErrorType.NO_PRODUCTS_FOUND);
+                });
     }
 
     @Override
@@ -57,10 +57,16 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public ProductDto saveProduct(ProductDto product) {
         Product productEntity = conversionService.convert(product, Product.class);
-        ProductDto productDto = conversionService.convert(productRepository.save(productEntity), ProductDto.class);
-        log.info("Product saved with success: {}", productDto);
-
-        return productDto;
+        try {
+            ProductDto productDto = conversionService.convert(productRepository.save(productEntity), ProductDto.class);
+            productRepository.flush();
+            log.info("Product saved with success: {}", productDto);
+            return productDto;
+        }
+        catch (DataIntegrityViolationException ex) {
+            log.error("Product with sku {} already exists", productEntity.getSku());
+            throw new ApplicationException(ErrorType.UNIQUE_CONSTRAINT_EXCEPTION);
+        }
     }
 
     @Override
@@ -79,8 +85,15 @@ public class ProductServiceImpl implements ProductService {
     public ProductDto updateProduct(ProductDto product) {
        productRepository.findById(product.getId())
                 .ifPresentOrElse(item -> {
-                            log.info("Product with id {} updated", product.getId());
-                            productRepository.save(conversionService.convert(product, Product.class));
+                    try {
+                        productRepository.save(conversionService.convert(product, Product.class));
+                        productRepository.flush();
+                        log.info("Product with id {} updated", product.getId());
+                    }
+                    catch (DataIntegrityViolationException ex) {
+                        log.error("Product with this sku {} already exists", product.getSku());
+                        throw new ApplicationException(ErrorType.UNIQUE_CONSTRAINT_EXCEPTION);
+                    }
                         },
                         () -> {
                             log.error("Product dont exists");

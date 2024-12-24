@@ -11,8 +11,7 @@ import lombok.Builder;
 import lombok.AccessLevel;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.JdbcType;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
@@ -43,7 +42,7 @@ public class Product {
     private String description;
 
     @Column(name = "category")
-    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private Categories category;
 
     @Column(name = "price")
