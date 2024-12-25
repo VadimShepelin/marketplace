@@ -55,15 +55,16 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public ProductDto saveProduct(ProductDto product) {
-        Optional<Product> maybeProduct = productRepository.findBySku(product.getSku());
-        if (maybeProduct.isPresent()) {
-            log.error("Product with sku {} already exists", product.getSku());
-            throw new ApplicationException(ErrorType.UNIQUE_CONSTRAINT_EXCEPTION);
-        }
+        productRepository.findBySku(product.getSku())
+                        .ifPresentOrElse((item) ->{
+                            log.error("Product with sku {} already exists", item.getSku());
+                            throw new ApplicationException(ErrorType.UNIQUE_CONSTRAINT_EXCEPTION);
+                        },() ->{
+                            productRepository.save(conversionService.convert(product, Product.class));
+                            log.info("Product saved: {}", product);
+                        });
 
-        Product productEntity = productRepository.save(conversionService.convert(product, Product.class));
-        log.info("Product saved: {}", productEntity);
-        return conversionService.convert(productEntity, ProductDto.class);
+        return product;
     }
 
     @Override
@@ -82,13 +83,14 @@ public class ProductServiceImpl implements ProductService {
     public ProductDto updateProduct(ProductDto product) {
        productRepository.findById(product.getId())
                 .ifPresentOrElse(item -> {
-                    Optional<Product> maybeProduct = productRepository.findBySku(product.getSku());
-                    if (maybeProduct.isPresent()) {
-                        log.error("Product with this sku {} already exists", product.getSku());
-                        throw new ApplicationException(ErrorType.UNIQUE_CONSTRAINT_EXCEPTION);
-                    }
-                    productRepository.save(conversionService.convert(product, Product.class));
-                    log.info("Product with id {} updated", product.getId());
+                    productRepository.findBySku(product.getSku())
+                                    .ifPresentOrElse((element)->{
+                                        log.error("Product with this sku {} already exists", element.getSku());
+                                        throw new ApplicationException(ErrorType.UNIQUE_CONSTRAINT_EXCEPTION);
+                                    },() ->{
+                                        productRepository.save(conversionService.convert(product, Product.class));
+                                        log.info("Product updated: {}", product);
+                                    });
                     }, () -> {log.error("Product dont exists");
                     throw new ApplicationException(ErrorType.PRODUCT_DONT_EXISTS);
                 });
