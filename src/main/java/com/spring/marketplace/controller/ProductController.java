@@ -17,7 +17,7 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public List<ProductDto> getAllProducts(@RequestParam(defaultValue = "2") int pageNo, @RequestParam(defaultValue = "2") int pageSize) {
+    public List<ProductDto> getAllProducts(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
         return productService.getAllProducts(pageNo,pageSize);
     }
 

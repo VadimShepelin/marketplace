@@ -8,7 +8,6 @@ import com.spring.marketplace.utils.enums.ErrorType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,17 +55,15 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public ProductDto saveProduct(ProductDto product) {
-        Product productEntity = conversionService.convert(product, Product.class);
-        try {
-            ProductDto productDto = conversionService.convert(productRepository.save(productEntity), ProductDto.class);
-            productRepository.flush();
-            log.info("Product saved with success: {}", productDto);
-            return productDto;
-        }
-        catch (DataIntegrityViolationException ex) {
-            log.error("Product with sku {} already exists", productEntity.getSku());
+        Optional<Product> maybeProduct = productRepository.findBySku(product.getSku());
+        if (maybeProduct.isPresent()) {
+            log.error("Product with sku {} already exists", product.getSku());
             throw new ApplicationException(ErrorType.UNIQUE_CONSTRAINT_EXCEPTION);
         }
+
+        Product productEntity = productRepository.save(conversionService.convert(product, Product.class));
+        log.info("Product saved: {}", productEntity);
+        return conversionService.convert(productEntity, ProductDto.class);
     }
 
     @Override
@@ -85,20 +82,16 @@ public class ProductServiceImpl implements ProductService {
     public ProductDto updateProduct(ProductDto product) {
        productRepository.findById(product.getId())
                 .ifPresentOrElse(item -> {
-                    try {
-                        productRepository.save(conversionService.convert(product, Product.class));
-                        productRepository.flush();
-                        log.info("Product with id {} updated", product.getId());
-                    }
-                    catch (DataIntegrityViolationException ex) {
+                    Optional<Product> maybeProduct = productRepository.findBySku(product.getSku());
+                    if (maybeProduct.isPresent()) {
                         log.error("Product with this sku {} already exists", product.getSku());
                         throw new ApplicationException(ErrorType.UNIQUE_CONSTRAINT_EXCEPTION);
                     }
-                        },
-                        () -> {
-                            log.error("Product dont exists");
-                            throw new ApplicationException(ErrorType.PRODUCT_DONT_EXISTS);
-                        });
+                    productRepository.save(conversionService.convert(product, Product.class));
+                    log.info("Product with id {} updated", product.getId());
+                    }, () -> {log.error("Product dont exists");
+                    throw new ApplicationException(ErrorType.PRODUCT_DONT_EXISTS);
+                });
 
        return conversionService.convert(product,ProductDto.class);
     }
