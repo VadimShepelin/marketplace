@@ -8,11 +8,12 @@ import com.spring.marketplace.utils.enums.ErrorType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -24,17 +25,17 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProductDto> getAllProducts() {
-        List<Product> allProductsList = productRepository.findAll();
-        if (allProductsList.isEmpty()) {
-            log.info("No products found");
-            throw new ApplicationException(ErrorType.NO_PRODUCTS_FOUND);
-        }
-
-        log.info("All products list: {}", allProductsList);
-        return allProductsList.stream().
-                map((item) -> conversionService.convert(item, ProductDto.class))
-                .collect(Collectors.toList());
+    public List<ProductDto> getAllProducts(int pageNo, int pageSize) {
+        return Optional.of(productRepository.findAll(PageRequest.of(pageNo, pageSize)))
+                .filter((item)->(!item.isEmpty()))
+                .map(page -> {
+                    log.info("Find all the products from page {}", page.getNumber());
+                    return page.map(product -> conversionService.convert(product, ProductDto.class)).stream().toList();
+                })
+                .orElseThrow(() -> {
+                    log.error("No products found");
+                    return new ApplicationException(ErrorType.NO_PRODUCTS_FOUND);
+                });
     }
 
     @Override
@@ -54,11 +55,16 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public ProductDto saveProduct(ProductDto product) {
-        Product productEntity = conversionService.convert(product, Product.class);
-        ProductDto productDto = conversionService.convert(productRepository.save(productEntity), ProductDto.class);
-        log.info("Product saved with success: {}", productDto);
+        productRepository.findBySku(product.getSku())
+                        .ifPresentOrElse((item) ->{
+                            log.error("Product with sku {} already exists", item.getSku());
+                            throw new ApplicationException(ErrorType.UNIQUE_CONSTRAINT_EXCEPTION);
+                        },() ->{
+                            productRepository.save(conversionService.convert(product, Product.class));
+                            log.info("Product saved: {}", product);
+                        });
 
-        return productDto;
+        return product;
     }
 
     @Override
@@ -77,13 +83,17 @@ public class ProductServiceImpl implements ProductService {
     public ProductDto updateProduct(ProductDto product) {
        productRepository.findById(product.getId())
                 .ifPresentOrElse(item -> {
-                            log.info("Product with id {} updated", product.getId());
-                            productRepository.save(conversionService.convert(product, Product.class));
-                        },
-                        () -> {
-                            log.error("Product dont exists");
-                            throw new ApplicationException(ErrorType.PRODUCT_DONT_EXISTS);
-                        });
+                    productRepository.findBySku(product.getSku())
+                                    .ifPresentOrElse((element)->{
+                                        log.error("Product with this sku {} already exists", element.getSku());
+                                        throw new ApplicationException(ErrorType.UNIQUE_CONSTRAINT_EXCEPTION);
+                                    },() ->{
+                                        productRepository.save(conversionService.convert(product, Product.class));
+                                        log.info("Product updated: {}", product);
+                                    });
+                    }, () -> {log.error("Product dont exists");
+                    throw new ApplicationException(ErrorType.PRODUCT_DONT_EXISTS);
+                });
 
        return conversionService.convert(product,ProductDto.class);
     }

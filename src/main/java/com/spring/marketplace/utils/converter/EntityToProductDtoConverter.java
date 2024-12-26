@@ -17,7 +17,7 @@ public class EntityToProductDtoConverter implements Converter<Product, ProductDt
                 .createdAt(product.getCreatedAt())
                 .description(product.getDescription())
                 .quantity(product.getQuantity())
-                .category(String.valueOf(product.getCategory()))
+                .category(product.getCategory())
                 .sku(product.getSku())
                 .updated_at(product.getUpdatedAt())
                 .build();

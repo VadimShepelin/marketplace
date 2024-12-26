@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public interface ProductService{
 
-    List<ProductDto> getAllProducts();
+    List<ProductDto> getAllProducts(int pageNo, int pageSize);
 
     ProductDto getProductById(UUID id);
 
