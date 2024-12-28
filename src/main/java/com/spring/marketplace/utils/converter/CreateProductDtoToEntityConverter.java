@@ -1,17 +1,16 @@
 package com.spring.marketplace.utils.converter;
 
 
-import com.spring.marketplace.dto.ProductDto;
-import com.spring.marketplace.model.Categories;
+import com.spring.marketplace.dto.CreateProductDto;
 import com.spring.marketplace.model.Product;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProductDtoToEntityConverter implements Converter<ProductDto, Product> {
+public class CreateProductDtoToEntityConverter implements Converter<CreateProductDto, Product> {
 
     @Override
-    public Product convert(ProductDto productDto) {
+    public Product convert(CreateProductDto productDto) {
         return Product.builder()
                 .id(productDto.getId())
                 .name(productDto.getName())

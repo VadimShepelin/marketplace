@@ -8,25 +8,18 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.Instant;
-import java.util.UUID;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Builder;
 
-@ToString(exclude = "category")
-@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Builder
-public class ProductDto {
-
-    private UUID id;
+public class ReadProductDto {
 
     @NotBlank(message = "Name must be not empty")
     private String name;
@@ -46,7 +39,7 @@ public class ProductDto {
     @NotBlank(message = "SKU must be not empty")
     private String sku;
 
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
-    private Instant updated_at;
+    private LocalDateTime updated_at;
 }

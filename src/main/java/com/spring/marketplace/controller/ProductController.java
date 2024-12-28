@@ -1,6 +1,6 @@
 package com.spring.marketplace.controller;
 
-import com.spring.marketplace.dto.ProductDto;
+import com.spring.marketplace.dto.CreateProductDto;
 import com.spring.marketplace.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +17,12 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public List<ProductDto> getAllProducts(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
+    public List<CreateProductDto> getAllProducts(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
         return productService.getAllProducts(pageNo,pageSize);
     }
 
     @GetMapping("/{id}")
-    public ProductDto getProductById(@PathVariable UUID id) {
+    public CreateProductDto getProductById(@PathVariable UUID id) {
         return productService.getProductById(id);
     }
 
@@ -33,12 +33,12 @@ public class ProductController {
     }
 
     @PostMapping
-    public ProductDto createProduct(@Valid @RequestBody ProductDto productDto) {
+    public CreateProductDto createProduct(@Valid @RequestBody CreateProductDto productDto) {
        return productService.saveProduct(productDto);
     }
 
     @PutMapping
-    public ProductDto updateProduct(@Valid @RequestBody ProductDto productDto) {
+    public CreateProductDto updateProduct(@Valid @RequestBody CreateProductDto productDto) {
         return productService.updateProduct(productDto);
     }
 

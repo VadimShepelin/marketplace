@@ -9,8 +9,8 @@ create table products
     price           numeric not null check (price > 99),
     quantity        bigint,
     sku             character varying(32) not null unique,
-    created_at      date,
-    quantity_update date,
+    created_at      timestamp,
+    quantity_update timestamp,
     category        categories
 );
 

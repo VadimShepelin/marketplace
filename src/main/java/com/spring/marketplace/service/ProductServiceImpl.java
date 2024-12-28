@@ -1,6 +1,6 @@
 package com.spring.marketplace.service;
 
-import com.spring.marketplace.dto.ProductDto;
+import com.spring.marketplace.dto.CreateProductDto;
 import com.spring.marketplace.exception.ApplicationException;
 import com.spring.marketplace.model.Product;
 import com.spring.marketplace.repository.ProductRepository;
@@ -25,12 +25,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProductDto> getAllProducts(int pageNo, int pageSize) {
+    public List<CreateProductDto> getAllProducts(int pageNo, int pageSize) {
         return Optional.of(productRepository.findAll(PageRequest.of(pageNo, pageSize)))
                 .filter((item)->(!item.isEmpty()))
                 .map(page -> {
                     log.info("Find all the products from page {}", page.getNumber());
-                    return page.map(product -> conversionService.convert(product, ProductDto.class)).stream().toList();
+                    return page.map(product -> conversionService.convert(product, CreateProductDto.class)).stream().toList();
                 })
                 .orElseThrow(() -> {
                     log.error("No products found");
@@ -40,9 +40,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public ProductDto getProductById(UUID id) {
-        ProductDto product = productRepository.findById(id)
-                .map(item -> conversionService.convert(item, ProductDto.class))
+    public CreateProductDto getProductById(UUID id) {
+        CreateProductDto product = productRepository.findById(id)
+                .map(item -> conversionService.convert(item, CreateProductDto.class))
                 .orElseThrow(() -> {
                     log.error("Product with id {} not found", id);
                     return new ApplicationException(ErrorType.PRODUCT_NOT_FOUND);
@@ -54,7 +54,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ProductDto saveProduct(ProductDto product) {
+    public CreateProductDto saveProduct(CreateProductDto product) {
         productRepository.findBySku(product.getSku())
                         .ifPresentOrElse((item) ->{
                             log.error("Product with sku {} already exists", item.getSku());
@@ -80,7 +80,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ProductDto updateProduct(ProductDto product) {
+    public CreateProductDto updateProduct(CreateProductDto product) {
        productRepository.findById(product.getId())
                 .ifPresentOrElse(item -> {
                     productRepository.findBySku(product.getSku())
@@ -95,6 +95,6 @@ public class ProductServiceImpl implements ProductService {
                     throw new ApplicationException(ErrorType.PRODUCT_DONT_EXISTS);
                 });
 
-       return conversionService.convert(product,ProductDto.class);
+       return conversionService.convert(product, CreateProductDto.class);
     }
 }
