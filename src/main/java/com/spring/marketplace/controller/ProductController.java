@@ -27,9 +27,9 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteProductById(@PathVariable UUID id) {
+    public ResponseEntity<String> deleteProductById(@PathVariable UUID id) {
         productService.deleteProduct(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Product was deleted");
     }
 
     @PostMapping
