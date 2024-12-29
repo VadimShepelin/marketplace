@@ -1,18 +1,20 @@
 package com.spring.marketplace.service;
 
 import com.spring.marketplace.dto.CreateProductDto;
+import com.spring.marketplace.dto.ReadProductDto;
+import com.spring.marketplace.dto.UpdateProductDto;
 import java.util.List;
 import java.util.UUID;
 
 public interface ProductService{
 
-    List<CreateProductDto> getAllProducts(int pageNo, int pageSize);
+    List<ReadProductDto> getAllProducts(int pageNo, int pageSize);
 
-    CreateProductDto getProductById(UUID id);
+    ReadProductDto getProductById(UUID id);
 
-    CreateProductDto saveProduct(CreateProductDto product);
+    ReadProductDto saveProduct(CreateProductDto product);
 
     void deleteProduct(UUID id);
 
-    CreateProductDto updateProduct(CreateProductDto product);
+    ReadProductDto updateProduct(UpdateProductDto product);
 }

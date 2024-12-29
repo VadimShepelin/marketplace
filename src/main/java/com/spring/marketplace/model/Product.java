@@ -1,14 +1,12 @@
 package com.spring.marketplace.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
-import lombok.ToString;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.Getter;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.AccessLevel;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -25,6 +23,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@Setter
 @Builder
 public class Product {
 
