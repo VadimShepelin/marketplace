@@ -2,7 +2,6 @@ package com.spring.marketplace.dto;
 
 
 import com.spring.marketplace.model.Categories;
-import jakarta.persistence.Id;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,16 +13,12 @@ import lombok.Getter;
 import lombok.Builder;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Builder
 public class UpdateProductDto {
-
-    @Id
-    private UUID id;
 
     @NotBlank(message = "Name must be not empty")
     private String name;

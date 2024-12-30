@@ -1,7 +1,7 @@
 package com.spring.marketplace.service;
 
 import com.spring.marketplace.dto.CreateProductDto;
-import com.spring.marketplace.dto.ReadProductDto;
+import com.spring.marketplace.dto.GetProductResponse;
 import com.spring.marketplace.dto.UpdateProductDto;
 import com.spring.marketplace.exception.ApplicationException;
 import com.spring.marketplace.model.Product;
@@ -28,12 +28,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ReadProductDto> getAllProducts(int pageNo, int pageSize) {
+    public List<GetProductResponse> getAllProducts(int pageNo, int pageSize) {
         return Optional.of(productRepository.findAll(PageRequest.of(pageNo, pageSize)))
                 .filter((item)->(!item.isEmpty()))
                 .map(page -> {
                     log.info("Find all the products from page {}", page.getNumber());
-                    return page.map(product -> conversionService.convert(product, ReadProductDto.class)).stream().toList();
+                    return page.map(product -> conversionService.convert(product, GetProductResponse.class)).stream().toList();
                 })
                 .orElseThrow(() -> {
                     log.error("No products found");
@@ -43,9 +43,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public ReadProductDto getProductById(UUID id) {
-        ReadProductDto product = productRepository.findById(id)
-                .map(item -> conversionService.convert(item, ReadProductDto.class))
+    public GetProductResponse getProductById(UUID id) {
+        GetProductResponse product = productRepository.findById(id)
+                .map(item -> conversionService.convert(item, GetProductResponse.class))
                 .orElseThrow(() -> {
                     log.error("Product with id {} not found", id);
                     return new ApplicationException(ErrorType.PRODUCT_NOT_FOUND);
@@ -57,7 +57,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ReadProductDto saveProduct(CreateProductDto product) {
+    public GetProductResponse saveProduct(CreateProductDto product) {
         Product productEntity = productRepository.findBySku(product.getSku())
                 .filter((item) -> {
                     log.error("Product with sku {} already exists", item.getSku());
@@ -67,7 +67,7 @@ public class ProductServiceImpl implements ProductService {
                     return productRepository.save(conversionService.convert(product, Product.class));
                 });
 
-        return conversionService.convert(productEntity, ReadProductDto.class);
+        return conversionService.convert(productEntity, GetProductResponse.class);
     }
 
     @Override
@@ -83,34 +83,26 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ReadProductDto updateProduct(UpdateProductDto product) {
-        Product productEntity = productRepository.findById(product.getId())
-                .orElseThrow(() -> {
-                    log.error("Product with id{} not found",product.getId());
-                    return new ApplicationException(ErrorType.PRODUCT_NOT_FOUND);
-                });
+    public GetProductResponse updateProduct(UpdateProductDto productDto) {
+        Product productEntity = productRepository.findBySku(productDto.getSku()).orElseThrow(() -> {
+            log.error("Product with sku {} not found", productDto.getSku());
+            return new ApplicationException(ErrorType.PRODUCT_NOT_FOUND);
+        });
 
-        productRepository.findBySkuAndIdNot(product.getSku(),productEntity.getId())
-                        .ifPresentOrElse((item) -> {
-                            log.error("Product with this sku {} already exists", item.getSku());
-                            throw new ApplicationException(ErrorType.UNIQUE_CONSTRAINT_EXCEPTION);
-                        },()-> setProductDetails(product,productEntity));
+        Product product = Product.builder().
+                id(productEntity.getId()).
+                sku(productDto.getSku()).
+                name(productDto.getName())
+                .category(productDto.getCategory())
+                .price(productDto.getPrice())
+                .description(productDto.getDescription())
+                .quantity(productDto.getQuantity())
+                .updatedAt(!productDto.getQuantity().equals(productEntity.getQuantity()) ?
+                        LocalDateTime.now() : productEntity.getUpdatedAt())
+                .createdAt(productEntity.getCreatedAt())
+                .build();
 
-        log.info("Product updated: {}", product);
-        return conversionService.convert(productRepository.save(productEntity), ReadProductDto.class);
-    }
-
-    private void setProductDetails(UpdateProductDto from, Product to) {
-        to.setSku(from.getSku());
-        to.setPrice(from.getPrice());
-        to.setName(from.getName());
-        to.setDescription(from.getDescription());
-        to.setCategory(from.getCategory());
-        to.setName(from.getName());
-
-        if (!from.getQuantity().equals(to.getQuantity())) {
-            to.setQuantity(from.getQuantity());
-            to.setUpdatedAt(LocalDateTime.now());
-        }
+        log.info("Product updated: {}", productDto);
+        return conversionService.convert(productRepository.save(product), GetProductResponse.class);
     }
 }

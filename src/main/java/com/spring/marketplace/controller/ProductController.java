@@ -1,7 +1,7 @@
 package com.spring.marketplace.controller;
 
 import com.spring.marketplace.dto.CreateProductDto;
-import com.spring.marketplace.dto.ReadProductDto;
+import com.spring.marketplace.dto.GetProductResponse;
 import com.spring.marketplace.dto.UpdateProductDto;
 import com.spring.marketplace.service.ProductService;
 import jakarta.validation.Valid;
@@ -19,12 +19,12 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public List<ReadProductDto> getAllProducts(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
+    public List<GetProductResponse> getAllProducts(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
         return productService.getAllProducts(pageNo,pageSize);
     }
 
     @GetMapping("/{id}")
-    public ReadProductDto getProductById(@PathVariable UUID id) {
+    public GetProductResponse getProductById(@PathVariable UUID id) {
         return productService.getProductById(id);
     }
 
@@ -35,12 +35,12 @@ public class ProductController {
     }
 
     @PostMapping
-    public ReadProductDto createProduct(@Valid @RequestBody CreateProductDto productDto) {
+    public GetProductResponse createProduct(@Valid @RequestBody CreateProductDto productDto) {
        return productService.saveProduct(productDto);
     }
 
     @PutMapping
-    public ReadProductDto updateProduct(@Valid @RequestBody UpdateProductDto productDto) {
+    public GetProductResponse updateProduct(@Valid @RequestBody UpdateProductDto productDto) {
         return productService.updateProduct(productDto);
     }
 
