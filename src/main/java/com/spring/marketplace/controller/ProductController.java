@@ -1,6 +1,8 @@
 package com.spring.marketplace.controller;
 
-import com.spring.marketplace.dto.ProductDto;
+import com.spring.marketplace.dto.CreateProductDto;
+import com.spring.marketplace.dto.GetProductResponse;
+import com.spring.marketplace.dto.UpdateProductDto;
 import com.spring.marketplace.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,28 +19,28 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public List<ProductDto> getAllProducts(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
+    public List<GetProductResponse> getAllProducts(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
         return productService.getAllProducts(pageNo,pageSize);
     }
 
     @GetMapping("/{id}")
-    public ProductDto getProductById(@PathVariable UUID id) {
+    public GetProductResponse getProductById(@PathVariable UUID id) {
         return productService.getProductById(id);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteProductById(@PathVariable UUID id) {
+    public ResponseEntity<String> deleteProductById(@PathVariable UUID id) {
         productService.deleteProduct(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Product was deleted");
     }
 
     @PostMapping
-    public ProductDto createProduct(@Valid @RequestBody ProductDto productDto) {
+    public GetProductResponse createProduct(@Valid @RequestBody CreateProductDto productDto) {
        return productService.saveProduct(productDto);
     }
 
     @PutMapping
-    public ProductDto updateProduct(@Valid @RequestBody ProductDto productDto) {
+    public GetProductResponse updateProduct(@Valid @RequestBody UpdateProductDto productDto) {
         return productService.updateProduct(productDto);
     }
 

@@ -1,6 +1,8 @@
 package com.spring.marketplace.service;
 
-import com.spring.marketplace.dto.ProductDto;
+import com.spring.marketplace.dto.CreateProductDto;
+import com.spring.marketplace.dto.GetProductResponse;
+import com.spring.marketplace.dto.UpdateProductDto;
 import com.spring.marketplace.exception.ApplicationException;
 import com.spring.marketplace.model.Product;
 import com.spring.marketplace.repository.ProductRepository;
@@ -11,6 +13,7 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,12 +28,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProductDto> getAllProducts(int pageNo, int pageSize) {
+    public List<GetProductResponse> getAllProducts(int pageNo, int pageSize) {
         return Optional.of(productRepository.findAll(PageRequest.of(pageNo, pageSize)))
                 .filter((item)->(!item.isEmpty()))
                 .map(page -> {
                     log.info("Find all the products from page {}", page.getNumber());
-                    return page.map(product -> conversionService.convert(product, ProductDto.class)).stream().toList();
+                    return page.map(product -> conversionService.convert(product, GetProductResponse.class)).stream().toList();
                 })
                 .orElseThrow(() -> {
                     log.error("No products found");
@@ -40,9 +43,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public ProductDto getProductById(UUID id) {
-        ProductDto product = productRepository.findById(id)
-                .map(item -> conversionService.convert(item, ProductDto.class))
+    public GetProductResponse getProductById(UUID id) {
+        GetProductResponse product = productRepository.findById(id)
+                .map(item -> conversionService.convert(item, GetProductResponse.class))
                 .orElseThrow(() -> {
                     log.error("Product with id {} not found", id);
                     return new ApplicationException(ErrorType.PRODUCT_NOT_FOUND);
@@ -54,17 +57,17 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ProductDto saveProduct(ProductDto product) {
-        productRepository.findBySku(product.getSku())
-                        .ifPresentOrElse((item) ->{
-                            log.error("Product with sku {} already exists", item.getSku());
-                            throw new ApplicationException(ErrorType.UNIQUE_CONSTRAINT_EXCEPTION);
-                        },() ->{
-                            productRepository.save(conversionService.convert(product, Product.class));
-                            log.info("Product saved: {}", product);
-                        });
+    public GetProductResponse saveProduct(CreateProductDto product) {
+        Product productEntity = productRepository.findBySku(product.getSku())
+                .filter((item) -> {
+                    log.error("Product with sku {} already exists", item.getSku());
+                    throw new ApplicationException(ErrorType.UNIQUE_CONSTRAINT_EXCEPTION);
+                }).orElseGet(() -> {
+                    log.info("Product saved: {}", product);
+                    return productRepository.save(conversionService.convert(product, Product.class));
+                });
 
-        return product;
+        return conversionService.convert(productEntity, GetProductResponse.class);
     }
 
     @Override
@@ -80,21 +83,26 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ProductDto updateProduct(ProductDto product) {
-       productRepository.findById(product.getId())
-                .ifPresentOrElse(item -> {
-                    productRepository.findBySku(product.getSku())
-                                    .ifPresentOrElse((element)->{
-                                        log.error("Product with this sku {} already exists", element.getSku());
-                                        throw new ApplicationException(ErrorType.UNIQUE_CONSTRAINT_EXCEPTION);
-                                    },() ->{
-                                        productRepository.save(conversionService.convert(product, Product.class));
-                                        log.info("Product updated: {}", product);
-                                    });
-                    }, () -> {log.error("Product dont exists");
-                    throw new ApplicationException(ErrorType.PRODUCT_DONT_EXISTS);
-                });
+    public GetProductResponse updateProduct(UpdateProductDto productDto) {
+        Product productEntity = productRepository.findBySku(productDto.getSku()).orElseThrow(() -> {
+            log.error("Product with sku {} not found", productDto.getSku());
+            return new ApplicationException(ErrorType.PRODUCT_NOT_FOUND);
+        });
 
-       return conversionService.convert(product,ProductDto.class);
+        Product product = Product.builder().
+                id(productEntity.getId()).
+                sku(productDto.getSku()).
+                name(productDto.getName())
+                .category(productDto.getCategory())
+                .price(productDto.getPrice())
+                .description(productDto.getDescription())
+                .quantity(productDto.getQuantity())
+                .updatedAt(!productDto.getQuantity().equals(productEntity.getQuantity()) ?
+                        LocalDateTime.now() : productEntity.getUpdatedAt())
+                .createdAt(productEntity.getCreatedAt())
+                .build();
+
+        log.info("Product updated: {}", productDto);
+        return conversionService.convert(productRepository.save(product), GetProductResponse.class);
     }
 }
