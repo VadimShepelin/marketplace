@@ -6,6 +6,11 @@ spring.datasource:
   url: jdbc:postgresql://localhost:5432/marketplace
   driver-class-name: org.postgresql.Driver
 
+app:
+    scheduling:
+      period: 30000
+      enabled: true
+
 server.port: 8081
 
 

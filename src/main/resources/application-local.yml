@@ -5,5 +5,10 @@ spring:
     password: password
     driverClassName: org.h2.Driver
 
+app:
+  scheduling:
+    period: 30000
+    enabled: true
+
 server:
   port: 8081
