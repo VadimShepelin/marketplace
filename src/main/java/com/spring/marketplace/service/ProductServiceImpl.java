@@ -1,5 +1,6 @@
 package com.spring.marketplace.service;
 
+import com.spring.marketplace.aspects.LogExecutionTime;
 import com.spring.marketplace.dto.CreateProductDto;
 import com.spring.marketplace.dto.GetProductResponse;
 import com.spring.marketplace.dto.UpdateProductDto;
@@ -8,6 +9,7 @@ import com.spring.marketplace.model.Product;
 import com.spring.marketplace.repository.ProductRepository;
 import com.spring.marketplace.utils.enums.ErrorType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +29,7 @@ public class ProductServiceImpl implements ProductService {
     private final ConversionService conversionService;
 
     @Override
+    @LogExecutionTime
     @Transactional(readOnly = true)
     public List<GetProductResponse> getAllProducts(int pageNo, int pageSize) {
         return Optional.of(productRepository.findAll(PageRequest.of(pageNo, pageSize)))
@@ -43,6 +46,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
+    @LogExecutionTime
     public GetProductResponse getProductById(UUID id) {
         GetProductResponse product = productRepository.findById(id)
                 .map(item -> conversionService.convert(item, GetProductResponse.class))
@@ -57,6 +61,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @LogExecutionTime
     public GetProductResponse saveProduct(CreateProductDto product) {
         Product productEntity = productRepository.findBySku(product.getSku())
                 .filter((item) -> {
@@ -72,6 +77,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @LogExecutionTime
     public void deleteProduct(UUID id) {
         productRepository.findById(id)
                 .ifPresentOrElse(item -> productRepository.deleteById(item.getId()),
@@ -83,6 +89,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @LogExecutionTime
     public GetProductResponse updateProduct(UpdateProductDto productDto) {
         Product productEntity = productRepository.findBySku(productDto.getSku()).orElseThrow(() -> {
             log.error("Product with sku {} not found", productDto.getSku());
