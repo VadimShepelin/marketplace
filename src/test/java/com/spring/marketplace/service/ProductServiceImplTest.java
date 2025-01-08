@@ -6,7 +6,6 @@ import com.spring.marketplace.dto.UpdateProductDto;
 import com.spring.marketplace.exception.ApplicationException;
 import com.spring.marketplace.model.Product;
 import com.spring.marketplace.repository.ProductRepository;
-import com.spring.marketplace.util.ProductTestUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import java.util.List;
 import java.util.Optional;
 
+import static com.spring.marketplace.util.ProductTestUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -35,8 +35,8 @@ class ProductServiceImplTest {
     @Test
     @DisplayName("Find product by id successfully")
     void getProductById_shouldReturnProduct() {
-        Product product = ProductTestUtil.createProduct();
-        GetProductResponse getProductResponse = ProductTestUtil.createGetProductResponse();
+        Product product = createProduct();
+        GetProductResponse getProductResponse = createGetProductResponse();
 
         doReturn(Optional.of(product)).when(productRepository).findById(product.getId());
         doReturn(getProductResponse).when(conversionService).convert(product, GetProductResponse.class);
@@ -50,9 +50,9 @@ class ProductServiceImplTest {
     @Test
     @DisplayName("Get all products list successfully")
     void getAllProducts_shouldReturnProductsList() {
-        Product product = ProductTestUtil.createProduct();
-        GetProductResponse getProductResponse = ProductTestUtil.createGetProductResponse();
-        Page page = ProductTestUtil.createPage(product);
+        Product product = createProduct();
+        GetProductResponse getProductResponse = createGetProductResponse();
+        Page page = createPage(product);
 
         doReturn(page).when(productRepository).findAll(any(PageRequest.class));
         doReturn(getProductResponse).when(conversionService).convert(product, GetProductResponse.class);
@@ -66,7 +66,7 @@ class ProductServiceImplTest {
     @Test
     @DisplayName("Successfully delete the product")
     void deleteProduct_shouldDeleteProduct() {
-        Product product = ProductTestUtil.createProduct();
+        Product product = createProduct();
 
         doReturn(Optional.of(product)).when(productRepository).findById(product.getId());
         doNothing().when(productRepository).deleteById(product.getId());
@@ -79,9 +79,9 @@ class ProductServiceImplTest {
     @Test
     @DisplayName("Successfully save the product")
     void saveProduct_shouldSaveProduct() {
-        CreateProductDto productDto = ProductTestUtil.createProductDto();
-        Product product = ProductTestUtil.createProduct();
-        GetProductResponse getProductResponse = ProductTestUtil.createGetProductResponse();
+        CreateProductDto productDto = createProductDto();
+        Product product = createProduct();
+        GetProductResponse getProductResponse = createGetProductResponse();
 
         doReturn(Optional.empty()).when(productRepository).findBySku(productDto.getSku());
         doReturn(product).when(conversionService).convert(productDto,Product.class);
@@ -97,9 +97,9 @@ class ProductServiceImplTest {
     @Test
     @DisplayName("Successfully updated the product")
     void updateProduct_shouldUpdateProduct() {
-        UpdateProductDto productDto = ProductTestUtil.createUpdateProductDto();
-        Product product = ProductTestUtil.createProduct();
-        GetProductResponse getProductResponse = ProductTestUtil.createGetProductResponse();
+        UpdateProductDto productDto = createUpdateProductDto();
+        Product product = createProduct();
+        GetProductResponse getProductResponse = createGetProductResponse();
 
         doReturn(Optional.of(product)).when(productRepository).findBySku(productDto.getSku());
         doReturn(product).when(productRepository).save(product);
@@ -114,7 +114,7 @@ class ProductServiceImplTest {
     @Test
     @DisplayName("Product by this id not found")
     void getProductById_shouldThrowException_whenProductNotFound() {
-        Product product = ProductTestUtil.createProduct();
+        Product product = createProduct();
 
         doReturn(Optional.empty()).when(productRepository).findById(product.getId());
 
@@ -132,8 +132,8 @@ class ProductServiceImplTest {
     @Test
     @DisplayName("Save product with sku that already exists")
     void saveProduct_shouldThrowException_whenProductWithThisSkuAlreadyExists(){
-        CreateProductDto productDto = ProductTestUtil.createProductDto();
-        Product product = ProductTestUtil.createProduct();
+        CreateProductDto productDto = createProductDto();
+        Product product = createProduct();
 
         doReturn(Optional.of(product)).when(productRepository).findBySku(productDto.getSku());
 
