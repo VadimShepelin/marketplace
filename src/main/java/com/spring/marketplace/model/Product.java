@@ -6,7 +6,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
+import lombok.ToString;
+import lombok.EqualsAndHashCode;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Builder;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -58,4 +65,7 @@ public class Product {
 
     @Column(name = "quantity_update")
     private LocalDateTime updatedAt;
+
+    @Column(name = "is_available")
+    private boolean isAvailable;
 }
