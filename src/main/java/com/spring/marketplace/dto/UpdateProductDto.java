@@ -6,18 +6,19 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.Builder;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Builder
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UpdateProductDto {
 
     @NotBlank(message = "Name must be not empty")
@@ -38,4 +39,5 @@ public class UpdateProductDto {
     @NotBlank(message = "SKU must be not empty")
     private String sku;
 
+    private Boolean isAvailable;
 }

@@ -106,6 +106,7 @@ public class ProductServiceImpl implements ProductService {
                 .category(productDto.getCategory())
                 .price(productDto.getPrice())
                 .description(productDto.getDescription())
+                .isAvailable(productDto.getIsAvailable()==null? true : productDto.getIsAvailable())
                 .quantity(productDto.getQuantity())
                 .updatedAt(!productDto.getQuantity().equals(productEntity.getQuantity()) ?
                         LocalDateTime.now() : productEntity.getUpdatedAt())
