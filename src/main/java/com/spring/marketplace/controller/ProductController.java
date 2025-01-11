@@ -2,6 +2,7 @@ package com.spring.marketplace.controller;
 
 import com.spring.marketplace.dto.CreateProductDto;
 import com.spring.marketplace.dto.GetProductResponse;
+import com.spring.marketplace.dto.ProductFilterDto;
 import com.spring.marketplace.dto.UpdateProductDto;
 import com.spring.marketplace.service.ProductService;
 import jakarta.validation.Valid;
@@ -43,5 +44,11 @@ public class ProductController {
     public GetProductResponse updateProduct(@Valid @RequestBody UpdateProductDto productDto) {
         return productService.updateProduct(productDto);
     }
+
+    @GetMapping("/search")
+    public List<GetProductResponse> searchProductsWithFilter(@RequestBody ProductFilterDto productDto){
+        return productService.searchProductsWithFilter(productDto);
+    }
+
 
 }

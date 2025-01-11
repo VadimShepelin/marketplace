@@ -8,18 +8,18 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.Builder;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-@ToString(exclude = "category")
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
+
 @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CreateProductDto {
 
     @NotBlank(message = "Name must be not empty")
@@ -40,4 +40,6 @@ public class CreateProductDto {
     @NotBlank(message = "SKU must be not empty")
     private String sku;
 
+    private Boolean isAvailable;
 }
+

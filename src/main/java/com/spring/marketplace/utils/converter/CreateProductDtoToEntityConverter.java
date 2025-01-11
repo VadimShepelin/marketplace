@@ -21,6 +21,7 @@ public class CreateProductDtoToEntityConverter implements Converter<CreateProduc
                 .updatedAt(LocalDateTime.now())
                 .quantity(productDto.getQuantity())
                 .category(productDto.getCategory())
+                .isAvailable(productDto.getIsAvailable()==null? true : productDto.getIsAvailable())
                 .build();
     }
 

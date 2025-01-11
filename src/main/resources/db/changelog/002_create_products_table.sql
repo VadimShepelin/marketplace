@@ -11,6 +11,7 @@ create table products
     sku             character varying(32) not null unique,
     created_at      timestamp,
     quantity_update timestamp,
-    category        categories
+    category        categories,
+    is_available    bool not null default true
 );
 

@@ -3,16 +3,19 @@ package com.spring.marketplace.service;
 import com.spring.marketplace.aspects.LogExecutionTime;
 import com.spring.marketplace.dto.CreateProductDto;
 import com.spring.marketplace.dto.GetProductResponse;
+import com.spring.marketplace.dto.ProductFilterDto;
 import com.spring.marketplace.dto.UpdateProductDto;
 import com.spring.marketplace.exception.ApplicationException;
 import com.spring.marketplace.model.Product;
 import com.spring.marketplace.repository.ProductRepository;
+import com.spring.marketplace.specification.ProductSpecification;
 import com.spring.marketplace.utils.enums.ErrorType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
@@ -103,6 +106,7 @@ public class ProductServiceImpl implements ProductService {
                 .category(productDto.getCategory())
                 .price(productDto.getPrice())
                 .description(productDto.getDescription())
+                .isAvailable(productDto.getIsAvailable()==null? true : productDto.getIsAvailable())
                 .quantity(productDto.getQuantity())
                 .updatedAt(!productDto.getQuantity().equals(productEntity.getQuantity()) ?
                         LocalDateTime.now() : productEntity.getUpdatedAt())
@@ -111,5 +115,23 @@ public class ProductServiceImpl implements ProductService {
 
         log.info("Product updated: {}", productDto);
         return conversionService.convert(productRepository.save(product), GetProductResponse.class);
+    }
+
+    @Override
+    @Transactional
+    @LogExecutionTime
+    public List<GetProductResponse> searchProductsWithFilter(ProductFilterDto productFilter) {
+        List<Product> productsList = Optional.of(productRepository.findAll(
+                Specification.where(ProductSpecification.byName(productFilter.getName()))
+                        .and(ProductSpecification.byQuantity(productFilter.getQuantity()))
+                        .and(ProductSpecification.byPrice(productFilter.getPrice()))
+                        .and(ProductSpecification.byAvailability(productFilter.getIsAvailable()))
+        )).orElseThrow(() -> {
+            log.error("No products found");
+            return new ApplicationException(ErrorType.NO_PRODUCTS_FOUND);
+        });
+
+        log.info("Found {} products", productsList);
+        return productsList.stream().map((product) -> conversionService.convert(product, GetProductResponse.class)).toList();
     }
 }
