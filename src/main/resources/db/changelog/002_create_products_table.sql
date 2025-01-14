@@ -12,6 +12,7 @@ create table products
     created_at      timestamp,
     quantity_update timestamp,
     category        categories,
-    is_available    bool not null default true
+    is_available    bool not null default true,
+    version         integer not null default 0
 );
 

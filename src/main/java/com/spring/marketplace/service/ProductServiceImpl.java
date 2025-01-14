@@ -99,22 +99,20 @@ public class ProductServiceImpl implements ProductService {
             return new ApplicationException(ErrorType.PRODUCT_NOT_FOUND);
         });
 
-        Product product = Product.builder().
-                id(productEntity.getId()).
-                sku(productDto.getSku()).
-                name(productDto.getName())
-                .category(productDto.getCategory())
-                .price(productDto.getPrice())
-                .description(productDto.getDescription())
-                .isAvailable(productDto.getIsAvailable()==null? true : productDto.getIsAvailable())
-                .quantity(productDto.getQuantity())
-                .updatedAt(!productDto.getQuantity().equals(productEntity.getQuantity()) ?
-                        LocalDateTime.now() : productEntity.getUpdatedAt())
-                .createdAt(productEntity.getCreatedAt())
-                .build();
+        productEntity.setSku(productDto.getSku());
+        productEntity.setName(productDto.getName());
+        productEntity.setCategory(productDto.getCategory());
+        productEntity.setPrice(productDto.getPrice());
+        productEntity.setDescription(productDto.getDescription());
+        productEntity.setAvailable(productDto.getIsAvailable()==null? true : productDto.getIsAvailable());
+        productEntity.setQuantity(productDto.getQuantity());
+        productEntity.setUpdatedAt(!productDto.getQuantity().equals(productEntity.getQuantity()) ?
+                LocalDateTime.now() : productEntity.getUpdatedAt());
+        productEntity.setCreatedAt(productEntity.getUpdatedAt());
+
 
         log.info("Product updated: {}", productDto);
-        return conversionService.convert(productRepository.save(product), GetProductResponse.class);
+        return conversionService.convert(productRepository.save(productEntity), GetProductResponse.class);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.spring.marketplace.model;
 
+import jakarta.persistence.Version;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
@@ -39,6 +40,10 @@ public class Product {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id")
     private UUID id;
+
+    @Column(name = "version")
+    @Version
+    private Integer version;
 
     @Column(name="name")
     private String name;
