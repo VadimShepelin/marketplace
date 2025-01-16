@@ -30,6 +30,7 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final ConversionService conversionService;
+    private final ReportService reportService;
 
     @Override
     @LogExecutionTime
@@ -129,6 +130,7 @@ public class ProductServiceImpl implements ProductService {
             return new ApplicationException(ErrorType.NO_PRODUCTS_FOUND);
         });
 
+        reportService.exportAllProductsInXlsxFile(productsList);
         log.info("Found {} products", productsList);
         return productsList.stream().map((product) -> conversionService.convert(product, GetProductResponse.class)).toList();
     }

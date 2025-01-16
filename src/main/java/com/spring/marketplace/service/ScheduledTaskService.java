@@ -20,7 +20,7 @@ public class ScheduledTaskService {
 
     @SneakyThrows
     @Transactional
-    @Scheduled(fixedRateString = "${app.scheduling.period}")
+    @Scheduled(fixedDelayString = "${app.scheduling.period}")
     public void increasePrice(){
         repository.findAllProductsAndLock().forEach((product) ->{
             product.setPrice(product.getPrice().multiply(new BigDecimal("1.1")));
