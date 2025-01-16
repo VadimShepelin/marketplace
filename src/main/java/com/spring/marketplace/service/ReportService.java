@@ -1,6 +1,8 @@
 package com.spring.marketplace.service;
 
+import com.spring.marketplace.exception.ApplicationException;
 import com.spring.marketplace.model.Product;
+import com.spring.marketplace.utils.enums.ErrorType;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
@@ -9,13 +11,14 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -60,5 +63,13 @@ public class ReportService  {
             fileOutputStream.close();
             log.info("Export data successful");
         }
+    }
+
+    public List<String> getReportFilesName() {
+        File baseFile = new File(fileBasePath);
+        File[] allFiles = Optional.ofNullable(baseFile.listFiles()).orElseThrow(() ->
+                new ApplicationException(ErrorType.FAILED_TO_GET_LIST_OF_FILES));
+
+        return Arrays.stream(allFiles).map(File::getName).toList();
     }
 }
