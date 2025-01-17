@@ -10,6 +10,8 @@ app:
     scheduling:
       period: 30000
       enabled: true
+    file:
+      path: C:\\marketplace\\marketplace\\src\\main\\resources\\reports\\
 
 server.port: 8081
 
