@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,8 +34,20 @@ public class FileStorageService {
         }
         catch (Exception ex){
             log.error(ex.getMessage());
-            throw new ApplicationException(ErrorType.FAILED_TO_SAVE_FILE);
+            throw new ApplicationException(ErrorType.FAILED_TO_UPLOAD_FILE);
         }
+    }
+
+    @SneakyThrows
+    public File downloadFile(String fileName) {
+        File fileToDownload = new File(basePath + fileName);
+        if(!fileToDownload.exists()){
+            log.error("File does not exist");
+            throw new ApplicationException(ErrorType.FAILED_TO_DOWNLOAD_FILE);
+        }
+
+        log.info("File download successfully");
+        return fileToDownload;
     }
 
 }
