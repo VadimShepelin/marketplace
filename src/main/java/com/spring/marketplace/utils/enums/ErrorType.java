@@ -5,7 +5,8 @@ public enum ErrorType {
     NO_PRODUCTS_FOUND("No products found"),
     PRODUCT_DONT_EXISTS("Product dont exists"),
     FAILED_TO_GET_LIST_OF_FILES("Failed to get list of files"),
-    UNIQUE_CONSTRAINT_EXCEPTION("A product with the same sku already exists");
+    UNIQUE_CONSTRAINT_EXCEPTION("A product with the same sku already exists"),
+    FAILED_TO_SAVE_FILE("Failed to save file");
 
 
     private final String message;
