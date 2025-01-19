@@ -1,4 +1,4 @@
-package com.spring.marketplace.service;
+package com.spring.marketplace.service.impl;
 
 import com.spring.marketplace.aspects.LogExecutionTime;
 import com.spring.marketplace.dto.CreateProductDto;
@@ -8,16 +8,19 @@ import com.spring.marketplace.dto.UpdateProductDto;
 import com.spring.marketplace.exception.ApplicationException;
 import com.spring.marketplace.model.Product;
 import com.spring.marketplace.repository.ProductRepository;
+import com.spring.marketplace.service.ExchangeService;
+import com.spring.marketplace.service.ProductService;
+import com.spring.marketplace.service.ReportService;
 import com.spring.marketplace.specification.ProductSpecification;
 import com.spring.marketplace.utils.enums.ErrorType;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +34,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ConversionService conversionService;
     private final ReportService reportService;
+    private final ExchangeService<BigDecimal,BigDecimal> exchangeService;
 
     @Override
     @LogExecutionTime
@@ -60,6 +64,7 @@ public class ProductServiceImpl implements ProductService {
                 });
         log.info("Product found: {}", product);
 
+        product.setPrice(exchangeService.convertCurrency(product.getPrice()));
         return product;
     }
 
