@@ -12,6 +12,8 @@ app:
       enabled: true
     file:
       path: C:\\marketplace\\marketplace\\src\\main\\resources\\reports\\
+    download-upload:
+      path: C:\\marketplace\\marketplace\\src\\main\\resources\\files\\
 
 server.port: 8081
 
