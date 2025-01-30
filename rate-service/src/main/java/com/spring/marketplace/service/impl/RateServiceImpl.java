@@ -10,28 +10,19 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RateServiceImpl implements RateService {
 
-    private static String defaultRateValue;
-
     @Override
     public String getRateValue(String rate) {
         log.info("Get rate value from the microservice: rate-service");
         if(rate!=null && rate.equals("USD")){
-            String exchangeRate = "105.32";
-            defaultRateValue = exchangeRate;
-            return exchangeRate;
+            return "105.32";
         }
         else if(rate!=null && rate.equals("EUR")){
-            String exchangeRate = "123.32";
-            defaultRateValue = exchangeRate;
-            return exchangeRate;
+            return "123.32";
         }
         else if(rate!=null && rate.equals("RUB")){
-            String exchangeRate = "1";
-            defaultRateValue = exchangeRate;
-            return exchangeRate;
+            return "1";
         }
-        else{
-            return defaultRateValue !=null? defaultRateValue :"1";
-        }
+
+        return "noRate";
     }
 }

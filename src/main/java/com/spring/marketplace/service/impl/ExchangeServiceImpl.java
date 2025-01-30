@@ -60,6 +60,11 @@ public class ExchangeServiceImpl implements ExchangeService<BigDecimal, BigDecim
             }
 
             String exchangeRate = rateServiceClient.getRateValue(rate);
+            exchangeRate = !exchangeRate.equals("noRate")?
+                    exchangeRate : session.getAttribute("rate") != null ?
+                    session.getAttribute("rate").toString() : defaultRateValue;
+
+            session.setAttribute("rate", exchangeRate);
             log.info("call rate service getRateValue() method");
             jedis.setex("exchangeRate", redisTtl, exchangeRate);
 
