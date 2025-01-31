@@ -3,7 +3,7 @@ package com.spring.marketplace.util;
 import com.spring.marketplace.dto.CreateProductDto;
 import com.spring.marketplace.dto.GetProductResponse;
 import com.spring.marketplace.dto.UpdateProductDto;
-import com.spring.marketplace.model.Categories;
+import com.spring.marketplace.model.enums.Categories;
 import com.spring.marketplace.model.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
