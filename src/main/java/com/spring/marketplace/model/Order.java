@@ -1,7 +1,15 @@
 package com.spring.marketplace.model;
 
 import com.spring.marketplace.model.enums.Status;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Column;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.PrePersist;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -38,4 +46,11 @@ public class Order {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @PrePersist
+    protected void onCreate() {
+        if(status==null){
+            status = Status.CREATED;
+        }
+    }
 }

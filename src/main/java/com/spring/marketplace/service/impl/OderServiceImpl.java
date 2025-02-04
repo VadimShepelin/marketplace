@@ -3,9 +3,9 @@ package com.spring.marketplace.service.impl;
 import com.spring.marketplace.dto.CreateOrderDto;
 import com.spring.marketplace.dto.GetOrderResponse;
 import com.spring.marketplace.dto.GetProductResponse;
+import com.spring.marketplace.dto.UpdateOrderStateDto;
 import com.spring.marketplace.exception.ApplicationException;
 import com.spring.marketplace.model.Order;
-import com.spring.marketplace.model.Product;
 import com.spring.marketplace.model.User;
 import com.spring.marketplace.repository.OrderRepository;
 import com.spring.marketplace.service.OrderService;
@@ -18,11 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 @Service
 @Slf4j
@@ -75,5 +70,19 @@ public class OderServiceImpl implements OrderService {
 
         userService.updateUserBalance(user.getId(), totalProductPrice);
         return totalProductPrice;
+    }
+
+    @Override
+    @Transactional
+    public GetOrderResponse updateOrderState(UpdateOrderStateDto dto){
+        Order order = orderRepository.findById(dto.getOrderId()).orElseThrow(
+                () -> {
+                    log.error("Order not found");
+                    return new ApplicationException(ErrorType.NOT_SUCH_ORDER);
+                });
+        order.setStatus(dto.getStatus());
+
+        log.info("Update order: {}", order);
+        return conversionService.convert(orderRepository.save(order),GetOrderResponse.class);
     }
 }

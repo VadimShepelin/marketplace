@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -17,4 +17,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
             "WHERE u.id = :id")
     @Modifying
     int updateBalance(BigDecimal balance, UUID id);
+
+    @Query("SELECT u FROM User u JOIN FETCH u.orders o")
+    List<User> findAllUsers();
 }

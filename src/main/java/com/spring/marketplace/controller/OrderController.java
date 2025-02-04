@@ -2,13 +2,11 @@ package com.spring.marketplace.controller;
 
 import com.spring.marketplace.dto.CreateOrderDto;
 import com.spring.marketplace.dto.GetOrderResponse;
+import com.spring.marketplace.dto.UpdateOrderStateDto;
 import com.spring.marketplace.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -18,7 +16,12 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public GetOrderResponse createOrder(@RequestBody CreateOrderDto dto) {
+    public GetOrderResponse createOrder(@Valid @RequestBody CreateOrderDto dto) {
         return orderService.createOrder(dto);
+    }
+
+    @PutMapping
+    public GetOrderResponse changeOrderState(@Valid @RequestBody UpdateOrderStateDto dto){
+        return orderService.updateOrderState(dto);
     }
 }

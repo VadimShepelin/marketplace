@@ -11,7 +11,8 @@ public enum ErrorType {
     FAILED_TO_CONVERT_CURRENCY("Failed to convert currency"),
     INSUFFICIENT_QUANTITY_OF_PRODUCTS("Insufficient quantity of products"),
     NO_SUCH_USER("No such user"),
-    NOT_ENOUGH_BALANCE("Not enough balance");
+    NOT_ENOUGH_BALANCE("Not enough balance"),
+    NOT_SUCH_ORDER("Not such order");
 
 
     private final String message;
