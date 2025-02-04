@@ -6,7 +6,6 @@ import com.spring.marketplace.dto.GetProductResponse;
 import com.spring.marketplace.dto.ProductFilterDto;
 import com.spring.marketplace.dto.UpdateProductDto;
 import com.spring.marketplace.exception.ApplicationException;
-import com.spring.marketplace.model.Product;
 import com.spring.marketplace.repository.ProductRepository;
 import com.spring.marketplace.service.ProductService;
 import com.spring.marketplace.service.ReportService;
@@ -19,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -68,13 +68,13 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @LogExecutionTime
     public GetProductResponse saveProduct(CreateProductDto product) {
-        Product productEntity = productRepository.findBySku(product.getSku())
+        com.spring.marketplace.model.Product productEntity = productRepository.findBySku(product.getSku())
                 .filter((item) -> {
                     log.error("Product with sku {} already exists", item.getSku());
                     throw new ApplicationException(ErrorType.UNIQUE_CONSTRAINT_EXCEPTION);
                 }).orElseGet(() -> {
                     log.info("Product saved: {}", product);
-                    return productRepository.save(conversionService.convert(product, Product.class));
+                    return productRepository.save(conversionService.convert(product, com.spring.marketplace.model.Product.class));
                 });
 
         return conversionService.convert(productEntity, GetProductResponse.class);
@@ -96,7 +96,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @LogExecutionTime
     public GetProductResponse updateProduct(UpdateProductDto productDto) {
-        Product productEntity = productRepository.findBySku(productDto.getSku()).orElseThrow(() -> {
+        com.spring.marketplace.model.Product productEntity = productRepository.findBySku(productDto.getSku()).orElseThrow(() -> {
             log.error("Product with sku {} not found", productDto.getSku());
             return new ApplicationException(ErrorType.PRODUCT_NOT_FOUND);
         });
@@ -121,7 +121,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @LogExecutionTime
     public List<GetProductResponse> searchProductsWithFilter(ProductFilterDto productFilter) {
-        List<Product> productsList = Optional.of(productRepository.findAll(
+        List<com.spring.marketplace.model.Product> productsList = Optional.of(productRepository.findAll(
                 Specification.where(ProductSpecification.byName(productFilter.getName()))
                         .and(ProductSpecification.byQuantity(productFilter.getQuantity()))
                         .and(ProductSpecification.byPrice(productFilter.getPrice()))
@@ -135,4 +135,29 @@ public class ProductServiceImpl implements ProductService {
         log.info("Found {} products", productsList);
         return productsList.stream().map((product) -> conversionService.convert(product, GetProductResponse.class)).toList();
     }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    @LogExecutionTime
+    public GetProductResponse getProductBySku(String sku) {
+        return productRepository.findBySku(sku).
+                map((item) -> {
+                    log.info("Get product by sku successfully");
+                    return conversionService.convert(item, GetProductResponse.class);
+                })
+                .orElseThrow(() -> {
+                    log.error("Product with this sku {} not found", sku);
+                    return new ApplicationException(ErrorType.PRODUCT_NOT_FOUND);
+                });
+    }
+
+    @Override
+    @Transactional
+    @LogExecutionTime
+    public void updateProductQuantity(String sku, BigInteger quantity) {
+        productRepository.updateProductByQuantity(sku,quantity);
+        log.info("Update product quantity successfully");
+    }
+
 }

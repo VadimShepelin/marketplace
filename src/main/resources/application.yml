@@ -16,7 +16,7 @@ app:
     rate-value: 1
   scheduling:
     period: 30000
-    enabled: true
+    enabled: false
   file:
     path: C:\\marketplace\\marketplace\\src\\main\\resources\\reports\\
   download-upload:
