@@ -9,7 +9,9 @@ import java.util.UUID;
 public interface UserService {
     User getUserById(UUID id);
 
-    void updateUserBalance(UUID id, BigDecimal balance);
+    void reduceUserBalance(UUID id, BigDecimal balance);
+
+    void increaseUserBalance(UUID userId, BigDecimal balance);
 
     List<GetUserResponse> getAllUsers();
 }

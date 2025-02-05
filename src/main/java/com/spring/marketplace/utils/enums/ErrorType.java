@@ -9,10 +9,9 @@ public enum ErrorType {
     FAILED_TO_UPLOAD_FILE("Failed to upload file"),
     FAILED_TO_DOWNLOAD_FILE("Failed to download file"),
     FAILED_TO_CONVERT_CURRENCY("Failed to convert currency"),
-    INSUFFICIENT_QUANTITY_OF_PRODUCTS("Insufficient quantity of products"),
     NO_SUCH_USER("No such user"),
-    NOT_ENOUGH_BALANCE("Not enough balance"),
-    NOT_SUCH_ORDER("Not such order");
+    NOT_SUCH_ORDER("Not such order"),
+    FAILED_TO_CHANGE_ORDER_STATUS("Failed to change order status");
 
 
     private final String message;

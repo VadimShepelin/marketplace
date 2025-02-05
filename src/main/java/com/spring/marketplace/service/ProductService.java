@@ -20,6 +20,8 @@ public interface ProductService{
 
     GetProductResponse saveProduct(CreateProductDto product);
 
+    List<GetProductResponse> findAllProductsBySkus(String... sku);
+
     void deleteProduct(UUID id);
 
     GetProductResponse updateProduct(UpdateProductDto product);

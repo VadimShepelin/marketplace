@@ -6,6 +6,7 @@ import com.spring.marketplace.dto.GetProductResponse;
 import com.spring.marketplace.dto.ProductFilterDto;
 import com.spring.marketplace.dto.UpdateProductDto;
 import com.spring.marketplace.exception.ApplicationException;
+import com.spring.marketplace.model.Product;
 import com.spring.marketplace.repository.ProductRepository;
 import com.spring.marketplace.service.ProductService;
 import com.spring.marketplace.service.ReportService;
@@ -68,13 +69,13 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @LogExecutionTime
     public GetProductResponse saveProduct(CreateProductDto product) {
-        com.spring.marketplace.model.Product productEntity = productRepository.findBySku(product.getSku())
+        Product productEntity = productRepository.findBySku(product.getSku())
                 .filter((item) -> {
                     log.error("Product with sku {} already exists", item.getSku());
                     throw new ApplicationException(ErrorType.UNIQUE_CONSTRAINT_EXCEPTION);
                 }).orElseGet(() -> {
                     log.info("Product saved: {}", product);
-                    return productRepository.save(conversionService.convert(product, com.spring.marketplace.model.Product.class));
+                    return productRepository.save(conversionService.convert(product, Product.class));
                 });
 
         return conversionService.convert(productEntity, GetProductResponse.class);
@@ -96,7 +97,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @LogExecutionTime
     public GetProductResponse updateProduct(UpdateProductDto productDto) {
-        com.spring.marketplace.model.Product productEntity = productRepository.findBySku(productDto.getSku()).orElseThrow(() -> {
+        Product productEntity = productRepository.findBySku(productDto.getSku()).orElseThrow(() -> {
             log.error("Product with sku {} not found", productDto.getSku());
             return new ApplicationException(ErrorType.PRODUCT_NOT_FOUND);
         });
@@ -121,7 +122,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @LogExecutionTime
     public List<GetProductResponse> searchProductsWithFilter(ProductFilterDto productFilter) {
-        List<com.spring.marketplace.model.Product> productsList = Optional.of(productRepository.findAll(
+        List<Product> productsList = Optional.of(productRepository.findAll(
                 Specification.where(ProductSpecification.byName(productFilter.getName()))
                         .and(ProductSpecification.byQuantity(productFilter.getQuantity()))
                         .and(ProductSpecification.byPrice(productFilter.getPrice()))
@@ -158,6 +159,22 @@ public class ProductServiceImpl implements ProductService {
     public void updateProductQuantity(String sku, BigInteger quantity) {
         productRepository.updateProductByQuantity(sku,quantity);
         log.info("Update product quantity successfully");
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @LogExecutionTime
+    public List<GetProductResponse> findAllProductsBySkus(String... sku){
+        return Optional.of(productRepository.findAllProductsBySku(sku))
+                .filter((item)->(!item.isEmpty()))
+                .map(some -> {
+                    log.info("Find all the products by sku successfully");
+                    return some.stream().map((object) -> conversionService.convert(object, GetProductResponse.class)).toList();
+                })
+                .orElseThrow(() -> {
+                    log.error("No products found");
+                    return new ApplicationException(ErrorType.NO_PRODUCTS_FOUND);
+                });
     }
 
 }

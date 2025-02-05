@@ -22,6 +22,9 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
 
     Optional<Product> findBySku(String sku);
 
+    @Query("select p from Product p where p.sku in :sku")
+    List<Product> findAllProductsBySku(String... sku);
+
     @Modifying
     @Query(value = "update Product p " +
             "set p.quantity = p.quantity - :quantity " +

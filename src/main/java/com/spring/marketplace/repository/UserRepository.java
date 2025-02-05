@@ -16,7 +16,13 @@ public interface UserRepository extends JpaRepository<User, UUID> {
             "SET u.balance = u.balance - :balance " +
             "WHERE u.id = :id")
     @Modifying
-    int updateBalance(BigDecimal balance, UUID id);
+    int reduceUserBalance(BigDecimal balance, UUID id);
+
+    @Query("UPDATE User u " +
+            "SET u.balance = u.balance + :balance " +
+            "WHERE u.id = :id")
+    @Modifying
+    int increaseUserBalance(BigDecimal balance, UUID id);
 
     @Query("SELECT u FROM User u JOIN FETCH u.orders o")
     List<User> findAllUsers();

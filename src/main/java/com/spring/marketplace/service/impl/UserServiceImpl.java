@@ -35,9 +35,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateUserBalance(UUID userId, BigDecimal balance) {
-        userRepository.updateBalance(balance,userId);
-        log.info("Update user balance successfully");
+    public void reduceUserBalance(UUID userId, BigDecimal balance) {
+        userRepository.reduceUserBalance(balance,userId);
+        log.info("Reduce user balance successfully");
+    }
+
+    @Override
+    @Transactional
+    public void increaseUserBalance(UUID userId, BigDecimal balance) {
+        userRepository.increaseUserBalance(balance,userId);
+        log.info("Increase user balance successfully");
     }
 
     @Override

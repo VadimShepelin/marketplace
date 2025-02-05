@@ -7,6 +7,7 @@ import com.spring.marketplace.dto.UpdateOrderStateDto;
 import com.spring.marketplace.exception.ApplicationException;
 import com.spring.marketplace.model.Order;
 import com.spring.marketplace.model.User;
+import com.spring.marketplace.model.enums.Status;
 import com.spring.marketplace.repository.OrderRepository;
 import com.spring.marketplace.service.OrderService;
 import com.spring.marketplace.service.ProductService;
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -32,11 +34,22 @@ public class OderServiceImpl implements OrderService {
     @Override
     @Transactional
     public GetOrderResponse createOrder(CreateOrderDto dto) {
-        BigDecimal orderTotalPrice = validateOrder(dto);
-        log.info("Order validation was successful");
+        List<GetProductResponse> allProductsList = productService.findAllProductsBySkus(dto.getProductMap().keySet().toArray(String[]::new));
+        BigDecimal totalProductsPrice = allProductsList.
+                stream().map(GetProductResponse::getPrice).
+                reduce(BigDecimal.ZERO, BigDecimal::add);
+        Status orderStatus = validateOrder(dto,totalProductsPrice);
+
+        if(orderStatus==Status.APPROVED) {
+            dto.getProductMap().forEach(productService::updateProductQuantity);
+            userService.reduceUserBalance(dto.getUser_id(), totalProductsPrice);
+            log.info("Update balance and quantity was successful");
+            orderStatus = Status.DONE;
+        }
 
         Order order = Order.builder()
-                .totalCost(orderTotalPrice)
+                .totalCost(totalProductsPrice)
+                .status(orderStatus)
                 .user(userService.getUserById(dto.getUser_id()))
                 .build();
 
@@ -47,42 +60,38 @@ public class OderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public BigDecimal validateOrder(CreateOrderDto dto) {
-        BigDecimal totalProductPrice = dto.getProductMap().entrySet().stream()
-                .map(entry -> {
-                    GetProductResponse product = productService.getProductBySku(entry.getKey());
-
-                    if (product.getQuantity().compareTo(entry.getValue()) < 0) {
-                        log.error("Invalid product quantity");
-                        throw new ApplicationException(ErrorType.INSUFFICIENT_QUANTITY_OF_PRODUCTS);
-                    }
-
-                    productService.updateProductQuantity(entry.getKey(), entry.getValue());
-                    return product.getPrice().multiply(new BigDecimal(entry.getValue()));
-                })
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    public Status validateOrder(CreateOrderDto dto, BigDecimal totalProductsPrice) {
+        Status orderStatus = dto.getProductMap().entrySet().stream().
+                filter((item) -> productService.getProductBySku(item.getKey()).getQuantity().compareTo(item.getValue())<0)
+                .findAny().map((element) -> Status.REJECTED).orElse(Status.APPROVED);
 
         User user = userService.getUserById(dto.getUser_id());
-        if (user.getBalance().compareTo(totalProductPrice) < 0) {
+        if (user.getBalance().compareTo(totalProductsPrice) < 0) {
             log.error("Not enough balance to buy this products");
-            throw new ApplicationException(ErrorType.NOT_ENOUGH_BALANCE);
+            return Status.REJECTED;
         }
 
-        userService.updateUserBalance(user.getId(), totalProductPrice);
-        return totalProductPrice;
+        return orderStatus;
     }
 
     @Override
     @Transactional
     public GetOrderResponse updateOrderState(UpdateOrderStateDto dto){
-        Order order = orderRepository.findById(dto.getOrderId()).orElseThrow(
-                () -> {
-                    log.error("Order not found");
+        return orderRepository.findOrderByCompositeId(dto.getCompositeOrderId().getId(),dto.getCompositeOrderId().getUser())
+                .map((item) -> {
+                    if(dto.getStatus()==Status.REJECTED && item.getStatus()==Status.DONE ) {
+                        item.setStatus(Status.REJECTED);
+                        log.info("Change order status to REJECTED");
+                        userService.increaseUserBalance(item.getUser().getId(),item.getTotalCost());
+                        return conversionService.convert(orderRepository.save(item), GetOrderResponse.class);
+                    }
+                    else{
+                        log.error("Failed to change order status");
+                        throw new ApplicationException(ErrorType.FAILED_TO_CHANGE_ORDER_STATUS);
+                    }
+                }).orElseThrow(() -> {
+                    log.error("No such order");
                     return new ApplicationException(ErrorType.NOT_SUCH_ORDER);
                 });
-        order.setStatus(dto.getStatus());
-
-        log.info("Update order: {}", order);
-        return conversionService.convert(orderRepository.save(order),GetOrderResponse.class);
     }
 }
