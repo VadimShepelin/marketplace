@@ -12,4 +12,5 @@ public interface OrderItemsRepository extends JpaRepository<OrderItems, UUID> {
 
     @Query("SELECT i FROM OrderItems i where i.orderId = :orderId")
     List<OrderItems> findAllByOrderId(UUID orderId);
+
 }

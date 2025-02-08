@@ -18,7 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CreateOrderDto {
 
-    private UUID user_id;
+    private UUID id;
 
     @NotNull(message = "No products sku or their quantity were transferred")
     private Map<String, BigInteger> productMap;

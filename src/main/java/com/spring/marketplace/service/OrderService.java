@@ -15,4 +15,6 @@ public interface OrderService {
     GetOrderResponse updateOrderState(UpdateOrderStateDto dto);
 
     GetOrderResponse getOrderById(UUID id);
+
+    void updateOrderProducts(CreateOrderDto dto);
 }

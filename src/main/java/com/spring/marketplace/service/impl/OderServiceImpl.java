@@ -40,20 +40,20 @@ public class OderServiceImpl implements OrderService {
         Order order = Order.builder()
                 .status(orderStatus)
                 .order_id(UUID.randomUUID())
-                .user(userService.getUserById(dto.getUser_id()))
+                .user(userService.getUserById(dto.getId()))
                 .build();
 
         double orderTotalPrice = dto.getProductMap().entrySet().stream()
-                        .mapToDouble((item) -> {
-                            orderItemsRepository.save(OrderItems.builder()
-                                    .sku(item.getKey())
-                                    .quantity(item.getValue())
-                                    .orderId(order.getOrder_id())
-                                    .build());
+                .mapToDouble((item) -> {
+                    orderItemsRepository.save(OrderItems.builder()
+                            .sku(item.getKey())
+                            .quantity(item.getValue())
+                            .orderId(order.getOrder_id())
+                            .build());
 
-                            return item.getValue().doubleValue() *
-                                productService.getProductBySku(item.getKey()).getPrice().doubleValue();
-                        }).sum();
+                    return item.getValue().doubleValue() *
+                            productService.getProductBySku(item.getKey()).getPrice().doubleValue();
+                }).sum();
 
         dto.getProductMap().forEach(productService::reduceProductQuantity);
         log.info("Update Quantity was successful");
@@ -69,7 +69,7 @@ public class OderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public Status validateOrder(CreateOrderDto dto) {
         dto.getProductMap().entrySet().stream().
-                filter((item) -> productService.getProductBySku(item.getKey()).getQuantity().compareTo(item.getValue())<0)
+                filter((item) -> productService.getProductBySku(item.getKey()).getQuantity().compareTo(item.getValue()) < 0)
                 .findAny().ifPresent((element) -> {
                     log.info("Insufficient quantity of products");
                     throw new ApplicationException(ErrorType.INSUFFICIENT_QUANTITY_OF_PRODUCTS);
@@ -80,18 +80,16 @@ public class OderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public GetOrderResponse updateOrderState(UpdateOrderStateDto dto){
+    public GetOrderResponse updateOrderState(UpdateOrderStateDto dto) {
         return orderRepository.findOrderById(dto.getOrderId())
                 .map((item) -> {
-                    if(dto.getStatus()==Status.DONE && item.getStatus() == Status.CREATED) {
+                    if (dto.getStatus() == Status.DONE && item.getStatus() == Status.CREATED) {
                         item.setStatus(Status.DONE);
                         log.info("Change order status to DONE");
                         return conversionService.convert(orderRepository.save(item), GetOrderResponse.class);
-                    }
-
-                    else if(dto.getStatus()==Status.REJECTED && item.getStatus() == Status.CREATED) {
+                    } else if (dto.getStatus() == Status.REJECTED && item.getStatus() == Status.CREATED) {
                         orderItemsRepository.findAllByOrderId(dto.getOrderId())
-                                        .forEach((element) -> productService.increaseProductQuantity(element.getSku(),element.getQuantity()));
+                                .forEach((element) -> productService.increaseProductQuantity(element.getSku(), element.getQuantity()));
 
                         item.setStatus(Status.REJECTED);
                         log.info("Change order status to REJECTED");
@@ -115,5 +113,38 @@ public class OderServiceImpl implements OrderService {
             log.error("No such order");
             return new ApplicationException(ErrorType.NOT_SUCH_ORDER);
         });
+    }
+
+    @Override
+    @Transactional
+    public void updateOrderProducts(CreateOrderDto dto) {
+        validateOrder(dto);
+
+        Order order = orderRepository.findOrderById(dto.getId()).orElseThrow(() -> {
+            log.error("No such order");
+            return new ApplicationException(ErrorType.NOT_SUCH_ORDER);
+        });
+
+        if (order.getStatus() == Status.CREATED) {
+            double totalProductPrice = dto.getProductMap().entrySet().stream()
+                    .mapToDouble((item) -> {
+                        orderItemsRepository.save(OrderItems.builder()
+                                .sku(item.getKey())
+                                .quantity(item.getValue())
+                                .orderId(dto.getId())
+                                .build());
+
+                        return item.getValue().doubleValue() *
+                                productService.getProductBySku(item.getKey()).getPrice().doubleValue();
+                    }).sum();
+
+            orderRepository.updateOrderTotalCost(dto.getId(), totalProductPrice);
+            dto.getProductMap().forEach(productService::reduceProductQuantity);
+            log.info("Update Order successful");
+        }
+        else{
+            log.error("Failed to update order");
+            throw new ApplicationException(ErrorType.FAILED_TO_UPDATE_ORDER_PRODUCTS);
+        }
     }
 }
