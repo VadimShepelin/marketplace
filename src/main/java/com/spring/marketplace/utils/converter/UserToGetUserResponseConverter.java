@@ -14,7 +14,6 @@ public class UserToGetUserResponseConverter implements Converter<User, GetUserRe
         return GetUserResponse.builder()
                 .firstName(source.getFirstName())
                 .lastName(source.getLastName())
-                .balance(source.getBalance())
                 .orders(source.getOrders().stream().
                         map((item) ->
                                 GetOrderResponse.builder()

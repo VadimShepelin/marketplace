@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,20 +30,6 @@ public class UserServiceImpl implements UserService {
                     log.error("User with this id not found");
                     return new ApplicationException(ErrorType.NO_SUCH_USER);
                 });
-    }
-
-    @Override
-    @Transactional
-    public void reduceUserBalance(UUID userId, BigDecimal balance) {
-        userRepository.reduceUserBalance(balance,userId);
-        log.info("Reduce user balance successfully");
-    }
-
-    @Override
-    @Transactional
-    public void increaseUserBalance(UUID userId, BigDecimal balance) {
-        userRepository.increaseUserBalance(balance,userId);
-        log.info("Increase user balance successfully");
     }
 
     @Override

@@ -16,11 +16,11 @@ public interface ProductService{
 
     GetProductResponse getProductBySku(String sku);
 
-    void updateProductQuantity(String sku, BigInteger quantity);
+    void increaseProductQuantity(String sku, BigInteger quantity);
+
+    void reduceProductQuantity(String sku, BigInteger quantity);
 
     GetProductResponse saveProduct(CreateProductDto product);
-
-    List<GetProductResponse> findAllProductsBySkus(String... sku);
 
     void deleteProduct(UUID id);
 

@@ -1,6 +1,5 @@
 package com.spring.marketplace.dto;
 
-import com.spring.marketplace.model.OrderId;
 import com.spring.marketplace.model.enums.Status;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -9,6 +8,7 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.AccessLevel;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -17,8 +17,7 @@ import lombok.AccessLevel;
 @Builder
 public class UpdateOrderStateDto {
 
-    @NotNull(message = "Order composite id is null")
-    private OrderId compositeOrderId;
+    private UUID orderId;
 
     @NotNull(message = "Status is not correct")
     private Status status;

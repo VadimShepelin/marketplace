@@ -10,6 +10,6 @@ import java.util.UUID;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, UUID> {
 
-    @Query(value = "SELECT * FROM orders WHERE orders.id = ? AND orders.user_id = ?",nativeQuery = true)
-    Optional<Order> findOrderByCompositeId(UUID orderId, UUID userId);
+    @Query(value = "SELECT * FROM orders WHERE orders.id = ?",nativeQuery = true)
+    Optional<Order> findOrderById(UUID orderId);
 }

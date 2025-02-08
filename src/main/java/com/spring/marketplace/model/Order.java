@@ -5,8 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Column;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.FetchType;
@@ -17,7 +15,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Builder;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import java.math.BigDecimal;
@@ -32,11 +29,10 @@ import java.util.UUID;
 @Setter
 @Builder
 public class Order {
+
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id")
-    private UUID id;
+    private UUID order_id;
 
     @Column(name = "total_cost")
     private BigDecimal totalCost;
@@ -49,11 +45,4 @@ public class Order {
     @Id
     @JoinColumn(name = "user_id")
     private User user;
-
-    @PrePersist
-    protected void onCreate() {
-        if(status==null){
-            status = Status.CREATED;
-        }
-    }
 }

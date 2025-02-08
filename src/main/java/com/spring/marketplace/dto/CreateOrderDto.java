@@ -18,7 +18,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CreateOrderDto {
 
-    @NotNull(message = "User id must be not null")
     private UUID user_id;
 
     @NotNull(message = "No products sku or their quantity were transferred")

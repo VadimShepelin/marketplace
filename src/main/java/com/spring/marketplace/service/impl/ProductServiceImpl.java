@@ -156,25 +156,18 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     @LogExecutionTime
-    public void updateProductQuantity(String sku, BigInteger quantity) {
-        productRepository.updateProductByQuantity(sku,quantity);
-        log.info("Update product quantity successfully");
+    public void increaseProductQuantity(String sku, BigInteger quantity) {
+        productRepository.increaseProductQuantityBySku(sku,quantity);
+        log.info("Increase product quantity successfully");
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     @LogExecutionTime
-    public List<GetProductResponse> findAllProductsBySkus(String... sku){
-        return Optional.of(productRepository.findAllProductsBySku(sku))
-                .filter((item)->(!item.isEmpty()))
-                .map(some -> {
-                    log.info("Find all the products by sku successfully");
-                    return some.stream().map((object) -> conversionService.convert(object, GetProductResponse.class)).toList();
-                })
-                .orElseThrow(() -> {
-                    log.error("No products found");
-                    return new ApplicationException(ErrorType.NO_PRODUCTS_FOUND);
-                });
+    public void reduceProductQuantity(String sku, BigInteger quantity) {
+        productRepository.reduceProductQuantityBySku(sku,quantity);
+        log.info("Reduce product quantity successfully");
     }
+
 
 }
