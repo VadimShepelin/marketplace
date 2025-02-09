@@ -16,7 +16,7 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 
     @Query(value = "UPDATE Order o " +
             "set o.totalCost = o.totalCost + :cost " +
-            "where o.order_id = :id")
+            "where o.orderId = :id")
     @Modifying
     int updateOrderTotalCost(UUID id, double cost);
 }

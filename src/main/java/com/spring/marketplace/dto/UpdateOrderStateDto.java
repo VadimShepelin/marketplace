@@ -8,7 +8,6 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.AccessLevel;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -16,8 +15,6 @@ import java.util.UUID;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class UpdateOrderStateDto {
-
-    private UUID orderId;
 
     @NotNull(message = "Status is not correct")
     private Status status;

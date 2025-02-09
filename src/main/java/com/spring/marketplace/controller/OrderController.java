@@ -20,23 +20,17 @@ public class OrderController {
 
     @PostMapping
     public GetOrderResponse createOrder(@NotNull @RequestParam("user_id") UUID userId, @Valid @RequestBody CreateOrderDto dto) {
-        dto.setId(userId);
-
-        return orderService.createOrder(dto);
+        return orderService.createOrder(dto,userId);
     }
 
     @PutMapping("/state")
     public GetOrderResponse changeOrderState(@NotNull @RequestParam("order_id") UUID orderId, @Valid @RequestBody UpdateOrderStateDto dto){
-        dto.setOrderId(orderId);
-
-        return orderService.updateOrderState(dto);
+        return orderService.updateOrderState(dto,orderId);
     }
 
     @PutMapping
     public ResponseEntity<String> addProductsToOrder(@NotNull @RequestParam("order_id") UUID orderId, @Valid @RequestBody CreateOrderDto dto){
-        dto.setId(orderId);
-
-        orderService.updateOrderProducts(dto);
+        orderService.updateOrderProducts(dto,orderId);
 
         return ResponseEntity.ok("Add new products to order");
     }

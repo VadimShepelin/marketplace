@@ -8,13 +8,13 @@ import com.spring.marketplace.model.enums.Status;
 import java.util.UUID;
 
 public interface OrderService {
-    GetOrderResponse createOrder(CreateOrderDto dto);
+    GetOrderResponse createOrder(CreateOrderDto dto, UUID id);
 
     Status validateOrder(CreateOrderDto dto);
 
-    GetOrderResponse updateOrderState(UpdateOrderStateDto dto);
+    GetOrderResponse updateOrderState(UpdateOrderStateDto dto, UUID id);
 
     GetOrderResponse getOrderById(UUID id);
 
-    void updateOrderProducts(CreateOrderDto dto);
+    void updateOrderProducts(CreateOrderDto dto, UUID id);
 }

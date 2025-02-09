@@ -32,7 +32,7 @@ public class Order {
 
     @Id
     @Column(name = "id")
-    private UUID order_id;
+    private UUID orderId;
 
     @Column(name = "total_cost")
     private BigDecimal totalCost;

@@ -1,7 +1,6 @@
 package com.spring.marketplace.model;
 
 import lombok.*;
-
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -11,7 +10,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 public class OrderId implements Serializable {
-    private UUID order_id;
+    private UUID orderId;
 
     private UUID user;
 }

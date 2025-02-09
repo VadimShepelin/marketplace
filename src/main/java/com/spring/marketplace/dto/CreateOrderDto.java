@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.math.BigInteger;
 import java.util.Map;
-import java.util.UUID;
 
 @Builder
 @Getter
@@ -17,8 +16,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateOrderDto {
-
-    private UUID id;
 
     @NotNull(message = "No products sku or their quantity were transferred")
     private Map<String, BigInteger> productMap;
