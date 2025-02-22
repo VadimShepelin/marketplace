@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import redis.clients.jedis.JedisPool;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 @Configuration
@@ -14,7 +15,7 @@ import redis.clients.jedis.JedisPool;
         JmxAutoConfiguration.class
 })
 @EnableRedisRepositories
-public class RedisConfig {
+public class CacheConfig {
 
     @Value("${spring.redis.port}")
     private int port;
@@ -24,5 +25,10 @@ public class RedisConfig {
     @Bean
     public JedisPool jedisPool() {
         return new JedisPool(host,port);
+    }
+
+    @Bean
+    public ConcurrentHashMap<String, String> concurrentHashMap() {
+        return new ConcurrentHashMap<>();
     }
 }

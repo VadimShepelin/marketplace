@@ -17,17 +17,14 @@ import java.util.UUID;
 @JsonTypeName("completed")
 public class CompletedOrderEvent implements EventSource {
 
-    @NotNull(message = "Order id must be not null")
-    private UUID orderId;
-
     private Event event = Event.COMPLETED_ORDER;
 
     @Override
-    public void handleEvent(OrderService service) {
+    public void handleChangeOrderStatusEvent(OrderService service, UUID id) {
         UpdateOrderStateDto updateOrderDto = UpdateOrderStateDto.builder()
                 .status(Status.DONE)
                 .build();
 
-        service.updateOrderState(updateOrderDto, this.getOrderId());
+        service.updateOrderState(updateOrderDto, id);
     }
 }

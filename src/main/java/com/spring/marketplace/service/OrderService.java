@@ -11,11 +11,13 @@ import java.util.List;
 import java.util.UUID;
 
 public interface OrderService {
-    GetOrderResponse createOrder(CreateOrderDto dto, UUID id);
+    GetOrderResponse createOrder(CreateOrderDto dto, UUID id, UUID key);
 
     Status validateOrder(CreateOrderDto dto);
 
-    void handleOrderEvent(EventSource eventSource);
+    void handleCreateOrderEvent(EventSource eventSource, UUID id, UUID key);
+
+    void handleChangeOrderStatusEvent(EventSource eventSource, UUID id);
 
     GetOrderResponse updateOrderState(UpdateOrderStateDto dto, UUID id);
 

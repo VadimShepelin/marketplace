@@ -8,6 +8,7 @@ import com.spring.marketplace.model.OrderItems;
 import com.spring.marketplace.model.enums.Status;
 import com.spring.marketplace.repository.OrderItemsRepository;
 import com.spring.marketplace.repository.OrderRepository;
+import com.spring.marketplace.service.IdempotencyService;
 import com.spring.marketplace.service.OrderService;
 import com.spring.marketplace.service.ProductService;
 import com.spring.marketplace.service.UserService;
@@ -19,10 +20,7 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -35,39 +33,48 @@ public class OderServiceImpl implements OrderService {
     private final ConversionService conversionService;
     private final OrderItemsRepository orderItemsRepository;
     private final EmailServiceClient client;
+    private final IdempotencyService idempotencyService;
 
     @Override
     @Transactional
-    public GetOrderResponse createOrder(CreateOrderDto dto, UUID id) {
+    public GetOrderResponse createOrder(CreateOrderDto dto, UUID id, UUID key) {
         Status orderStatus = validateOrder(dto);
+        String orderId = idempotencyService.processOrderRequest(key);
+        Optional<Order> maybeOrder = orderRepository.findOrderById(UUID.fromString(orderId));
 
-        Order order = Order.builder()
-                .status(orderStatus)
-                .orderId(UUID.randomUUID())
-                .user(userService.getUserById(id))
-                .build();
+        if(maybeOrder.isEmpty()) {
+            Order order = Order.builder()
+                    .orderId(UUID.fromString(orderId))
+                    .status(orderStatus)
+                    .user(userService.getUserById(id))
+                    .build();
 
-        double orderTotalPrice = dto.getProductMap().entrySet().stream()
-                .mapToDouble((item) -> {
-                    orderItemsRepository.save(OrderItems.builder()
-                            .sku(item.getKey())
-                            .quantity(item.getValue())
-                            .orderId(order.getOrderId())
-                            .build());
+            double orderTotalPrice = dto.getProductMap().entrySet().stream()
+                    .mapToDouble((item) -> {
+                        orderItemsRepository.save(OrderItems.builder()
+                                .sku(item.getKey())
+                                .quantity(item.getValue())
+                                .orderId(order.getOrderId())
+                                .build());
 
-                    GetProductResponse product = productService.getProductBySku(item.getKey());
+                        GetProductResponse product = productService.getProductBySku(item.getKey());
 
-                    return item.getValue().doubleValue() *
-                            product.getPrice().doubleValue();
-                }).sum();
+                        return item.getValue().doubleValue() *
+                                product.getPrice().doubleValue();
+                    }).sum();
 
-        dto.getProductMap().forEach(productService::reduceProductQuantity);
-        log.info("Update Quantity was successful");
+            dto.getProductMap().forEach(productService::reduceProductQuantity);
+            log.info("Update Quantity was successful");
 
-        order.setTotalCost(BigDecimal.valueOf(orderTotalPrice));
+            order.setTotalCost(BigDecimal.valueOf(orderTotalPrice));
 
-        log.info("Save order: {}", order);
-        return conversionService.convert(orderRepository.save(order), GetOrderResponse.class);
+            log.info("Save order: {}", order);
+            return conversionService.convert(orderRepository.save(order), GetOrderResponse.class);
+        }
+        else{
+            log.info("Order already exists");
+            return conversionService.convert(maybeOrder.get(), GetOrderResponse.class);
+        }
     }
 
 
@@ -196,8 +203,14 @@ public class OderServiceImpl implements OrderService {
     }
 
     @Override
-    public void handleOrderEvent(EventSource eventSource) {
-        log.info("calling method handleOrderEvent");
-        eventSource.handleEvent(this);
+    public void handleCreateOrderEvent(EventSource eventSource, UUID id, UUID key) {
+        log.info("calling method handleCreateOrderEvent");
+        eventSource.handleCreateOrderEvent(this, id, key);
+    }
+
+    @Override
+    public void handleChangeOrderStatusEvent(EventSource eventSource, UUID id){
+        log.info("calling method handleChangeOrderStatusEvent");
+        eventSource.handleChangeOrderStatusEvent(this, id);
     }
 }

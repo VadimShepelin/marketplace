@@ -22,8 +22,8 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public GetOrderResponse createOrder(@NotNull @RequestParam("user_id") UUID userId, @Valid @RequestBody CreateOrderDto dto) {
-        return orderService.createOrder(dto,userId);
+    public GetOrderResponse createOrder(@NotNull @RequestParam("user_id") UUID userId, @NotNull @RequestHeader("idempotency_key") UUID idempotencyKey, @Valid @RequestBody CreateOrderDto dto) {
+        return orderService.createOrder(dto,userId,idempotencyKey);
     }
 
     @PutMapping("/state")
@@ -44,9 +44,18 @@ public class OrderController {
     }
 
     @PostMapping("/handle")
-    public ResponseEntity<String> handleOrderEvent(@Valid @RequestBody EventSource eventSource) {
-        orderService.handleOrderEvent(eventSource);
+    public ResponseEntity<String> handleCreateOrderEvent(@Valid @RequestBody EventSource eventSource, @NotNull @RequestParam("user_id") UUID userId, @NotNull @RequestHeader("idempotency_key") UUID idempotencyKey) {
+        orderService.handleCreateOrderEvent(eventSource, userId, idempotencyKey);
 
-        return ResponseEntity.ok("Order event handled successfully");
+        return ResponseEntity.ok("Create order event handled successfully");
     }
+
+    @PutMapping("/handle")
+    public ResponseEntity<String> handleChangeOrderStatusEvent(@Valid @RequestBody EventSource eventSource, @NotNull @RequestParam("order_id") UUID orderId) {
+        orderService.handleChangeOrderStatusEvent(eventSource, orderId);
+
+        return ResponseEntity.ok("Change order status event handled successfully");
+    }
+
+
 }

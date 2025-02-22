@@ -20,17 +20,14 @@ public class CreateOrderEvent implements EventSource {
     @NotNull(message = "No products sku or their quantity were transferred")
     private Map<String, BigInteger> productMap;
 
-    @NotNull(message = "Id must be not null")
-    private UUID userId;
-
     private Event event = Event.CREATE_ORDER;
 
     @Override
-    public void handleEvent(OrderService service) {
+    public void handleCreateOrderEvent(OrderService service, UUID id, UUID key) {
         CreateOrderDto createOrderDto = CreateOrderDto.builder()
                 .productMap(this.getProductMap())
                 .build();
 
-        service.createOrder(createOrderDto, this.getUserId());
+        service.createOrder(createOrderDto, id, key);
     }
 }
