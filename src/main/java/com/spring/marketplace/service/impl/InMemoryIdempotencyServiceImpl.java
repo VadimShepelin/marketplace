@@ -16,10 +16,10 @@ public class InMemoryIdempotencyServiceImpl implements IdempotencyService {
     private final ConcurrentHashMap<String, String> localCache;
 
     @Override
-    public String processOrderRequest(UUID key) {
-        log.info("call InMemoryIdempotencyServiceImpl.processOrderRequest");
-        localCache.computeIfAbsent(key.toString(), value -> UUID.randomUUID().toString());
+    public String processOrderRequest(UUID idempotencyKey) {
+        log.info("call InMemoryIdempotencyServiceImpl.processOrderRequest with idempotencyKey: {}", idempotencyKey);
+        localCache.computeIfAbsent(idempotencyKey.toString(), value -> UUID.randomUUID().toString());
 
-        return localCache.get(key.toString());
+        return localCache.get(idempotencyKey.toString());
     }
 }

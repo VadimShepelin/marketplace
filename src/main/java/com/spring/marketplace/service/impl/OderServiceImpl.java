@@ -37,19 +37,19 @@ public class OderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public GetOrderResponse createOrder(CreateOrderDto dto, UUID id, UUID key) {
+    public GetOrderResponse createOrder(CreateOrderDto dto, UUID userId, UUID idempotencyKey) {
         Status orderStatus = validateOrder(dto);
-        String orderId = idempotencyService.processOrderRequest(key);
+        String orderId = idempotencyService.processOrderRequest(idempotencyKey);
         Optional<Order> maybeOrder = orderRepository.findOrderById(UUID.fromString(orderId));
 
         if(maybeOrder.isEmpty()) {
             Order order = Order.builder()
                     .orderId(UUID.fromString(orderId))
                     .status(orderStatus)
-                    .user(userService.getUserById(id))
+                    .user(userService.getUserById(userId))
                     .build();
 
-            double orderTotalPrice = dto.getProductMap().entrySet().stream()
+            BigDecimal orderTotalPrice = BigDecimal.valueOf(dto.getProductMap().entrySet().stream()
                     .mapToDouble((item) -> {
                         orderItemsRepository.save(OrderItems.builder()
                                 .sku(item.getKey())
@@ -61,12 +61,12 @@ public class OderServiceImpl implements OrderService {
 
                         return item.getValue().doubleValue() *
                                 product.getPrice().doubleValue();
-                    }).sum();
+                    }).sum());
 
             dto.getProductMap().forEach(productService::reduceProductQuantity);
             log.info("Update Quantity was successful");
 
-            order.setTotalCost(BigDecimal.valueOf(orderTotalPrice));
+            order.setTotalCost(orderTotalPrice);
 
             log.info("Save order: {}", order);
             return conversionService.convert(orderRepository.save(order), GetOrderResponse.class);
@@ -93,15 +93,15 @@ public class OderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public GetOrderResponse updateOrderState(UpdateOrderStateDto dto, UUID id) {
-        return orderRepository.findOrderById(id)
+    public GetOrderResponse updateOrderState(UpdateOrderStateDto dto, UUID orderId) {
+        return orderRepository.findOrderById(orderId)
                 .map((item) -> {
                     if (dto.getStatus() == Status.DONE && item.getStatus() == Status.CREATED) {
                         item.setStatus(Status.DONE);
                         log.info("Change order status to DONE");
                         return conversionService.convert(orderRepository.save(item), GetOrderResponse.class);
                     } else if ((dto.getStatus() == Status.REJECTED || dto.getStatus() == Status.CANCELLED) && item.getStatus() == Status.CREATED) {
-                        orderItemsRepository.findAllByOrderId(id)
+                        orderItemsRepository.findAllByOrderId(orderId)
                                 .forEach((element) -> {
                                     productService.increaseProductQuantity(element.getSku(), element.getQuantity());
                                     orderItemsRepository.delete(element);
@@ -122,8 +122,8 @@ public class OderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public GetOrderResponse getOrderById(UUID id) {
-        return orderRepository.findById(id).map(
+    public GetOrderResponse getOrderById(UUID orderId) {
+        return orderRepository.findById(orderId).map(
                 (item) -> conversionService.convert(item, GetOrderResponse.class)
         ).orElseThrow(() -> {
             log.error("No such order");
@@ -133,10 +133,10 @@ public class OderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void updateOrderProducts(CreateOrderDto dto, UUID id) {
+    public void updateOrderProducts(CreateOrderDto dto, UUID orderId) {
         validateOrder(dto);
 
-        Order order = orderRepository.findOrderById(id).orElseThrow(() -> {
+        Order order = orderRepository.findOrderById(orderId).orElseThrow(() -> {
             log.error("No such order");
             return new ApplicationException(ErrorType.NOT_SUCH_ORDER);
         });
@@ -147,14 +147,14 @@ public class OderServiceImpl implements OrderService {
                         orderItemsRepository.save(OrderItems.builder()
                                 .sku(item.getKey())
                                 .quantity(item.getValue())
-                                .orderId(id)
+                                .orderId(orderId)
                                 .build());
 
                         return item.getValue().doubleValue() *
                                 productService.getProductBySku(item.getKey()).getPrice().doubleValue();
                     }).sum();
 
-            orderRepository.updateOrderTotalCost(id, totalProductPrice);
+            orderRepository.updateOrderTotalCost(orderId, totalProductPrice);
             dto.getProductMap().forEach(productService::reduceProductQuantity);
             log.info("Update Order successful");
         }
@@ -203,14 +203,14 @@ public class OderServiceImpl implements OrderService {
     }
 
     @Override
-    public void handleCreateOrderEvent(EventSource eventSource, UUID id, UUID key) {
+    public void handleCreateOrderEvent(EventSource eventSource, UUID userId, UUID idempotencyKey) {
         log.info("calling method handleCreateOrderEvent");
-        eventSource.handleCreateOrderEvent(this, id, key);
+        eventSource.handleCreateOrderEvent(this, userId, idempotencyKey);
     }
 
     @Override
-    public void handleChangeOrderStatusEvent(EventSource eventSource, UUID id){
+    public void handleChangeOrderStatusEvent(EventSource eventSource, UUID orderId){
         log.info("calling method handleChangeOrderStatusEvent");
-        eventSource.handleChangeOrderStatusEvent(this, id);
+        eventSource.handleChangeOrderStatusEvent(this, orderId);
     }
 }

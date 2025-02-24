@@ -13,7 +13,8 @@ public enum ErrorType {
     NOT_SUCH_ORDER("Not such order"),
     INSUFFICIENT_QUANTITY_OF_PRODUCTS("Insufficient quantity of goods"),
     FAILED_TO_CHANGE_ORDER_STATUS("Failed to change order status"),
-    FAILED_TO_UPDATE_ORDER_PRODUCTS("Failed to update order products");
+    FAILED_TO_UPDATE_ORDER_PRODUCTS("Failed to update order products"),
+    REDIS_EXCEPTION("Got an error when working with redis");
 
 
     private final String message;
