@@ -15,6 +15,10 @@ spring:
       properties:
         spring.json.trusted.packages: com.*
         spring.json.value.default.type: "com.spring.marketplace.events.EventSource"
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
   datasource:
     url: jdbc:h2:mem:mydb
     username: sa
@@ -47,6 +51,9 @@ app:
       url: http://localhost:8080/
     mail-service:
       url: http://localhost:8085/
+  kafka:
+    topic:
+      name: events
 
 server:
   port: 0

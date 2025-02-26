@@ -4,6 +4,7 @@ import com.spring.marketplace.dto.CreateOrderDto;
 import com.spring.marketplace.dto.GetOrderResponse;
 import com.spring.marketplace.dto.OrderWithProductsResponse;
 import com.spring.marketplace.dto.UpdateOrderStateDto;
+import com.spring.marketplace.kafka.KafkaEventProducer;
 import com.spring.marketplace.service.OrderService;
 import com.spring.marketplace.events.EventSource;
 import jakarta.validation.Valid;
@@ -20,6 +21,7 @@ import java.util.UUID;
 public class OrderController {
 
     private final OrderService orderService;
+    private final KafkaEventProducer kafkaEventProducer;
 
     @PostMapping
     public GetOrderResponse createOrder(@NotNull @RequestParam("user_id") UUID userId, @NotNull @RequestHeader("idempotency_key") UUID idempotencyKey, @Valid @RequestBody CreateOrderDto dto) {
@@ -55,6 +57,20 @@ public class OrderController {
         orderService.handleChangeOrderStatusEvent(eventSource, orderId);
 
         return ResponseEntity.ok("Change order status event handled successfully");
+    }
+
+    @PostMapping("/send")
+    public ResponseEntity<String> sendCreateOrderEvent(@Valid @RequestBody EventSource eventSource, @NotNull @RequestHeader("idempotency_key") UUID idempotencyKey, @NotNull @RequestParam("user_id") UUID userId) {
+        kafkaEventProducer.sendCreateOrderEvent(eventSource,userId,idempotencyKey);
+
+        return ResponseEntity.ok("Send create order event successfully");
+    }
+
+    @PutMapping("/send")
+    public ResponseEntity<String> sendUpdateOrderStatusEvent(@Valid @RequestBody EventSource eventSource, @NotNull @RequestParam("order_id") UUID orderId) {
+        kafkaEventProducer.sendUpdateOrderStatusEvent(eventSource,orderId);
+
+        return ResponseEntity.ok("Send update order status event successfully");
     }
 
 

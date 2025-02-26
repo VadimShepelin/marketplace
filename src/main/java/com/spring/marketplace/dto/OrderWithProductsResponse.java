@@ -1,5 +1,6 @@
 package com.spring.marketplace.dto;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,8 @@ import lombok.Setter;
 public class OrderWithProductsResponse {
 
     private UUID orderId;
+
+    private BigDecimal orderTotalPrice;
 
     private String clientFirstName;
 

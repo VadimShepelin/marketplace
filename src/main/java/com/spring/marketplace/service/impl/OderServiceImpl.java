@@ -187,6 +187,7 @@ public class OderServiceImpl implements OrderService {
             if(!orderProducts.isEmpty()) {
                 OrderWithProductsResponse orderResponse = OrderWithProductsResponse.builder()
                         .orderId(item.getOrderId())
+                        .orderTotalPrice(item.getTotalCost())
                         .products(orderProducts)
                         .clientInn(userInns.get(item.getUser().getEmail()))
                         .clientEmail(item.getUser().getEmail())
@@ -204,13 +205,13 @@ public class OderServiceImpl implements OrderService {
 
     @Override
     public void handleCreateOrderEvent(EventSource eventSource, UUID userId, UUID idempotencyKey) {
-        log.info("calling method handleCreateOrderEvent");
+        log.info("calling method handleCreateOrderEvent with event: {}", eventSource);
         eventSource.handleCreateOrderEvent(this, userId, idempotencyKey);
     }
 
     @Override
     public void handleChangeOrderStatusEvent(EventSource eventSource, UUID orderId){
-        log.info("calling method handleChangeOrderStatusEvent");
+        log.info("calling method handleChangeOrderStatusEvent with event: {}", eventSource);
         eventSource.handleChangeOrderStatusEvent(this, orderId);
     }
 }

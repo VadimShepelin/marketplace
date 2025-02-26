@@ -1,7 +1,8 @@
-package com.spring.marketplace.handler;
+package com.spring.marketplace.kafka;
 
 import com.spring.marketplace.dto.CreateOrderDto;
 import com.spring.marketplace.dto.UpdateOrderStateDto;
+import com.spring.marketplace.exception.ApplicationException;
 import com.spring.marketplace.model.enums.Status;
 import com.spring.marketplace.service.OrderService;
 import com.spring.marketplace.events.CancelledOrderEvent;
@@ -31,7 +32,12 @@ public class KafkaEventHandler {
                 .status(Status.CANCELLED)
                 .build();
 
-        orderService.updateOrderState(updateOrderDto, UUID.fromString(orderId));
+        try {
+            orderService.updateOrderState(updateOrderDto, UUID.fromString(orderId));
+        }
+        catch (ApplicationException ex){
+            log.error("Error updating order state. Exception message: {}", ex.getMessage());
+        }
     }
 
     @KafkaHandler
@@ -42,7 +48,12 @@ public class KafkaEventHandler {
                 .status(Status.DONE)
                 .build();
 
-        orderService.updateOrderState(completedOrderDto,UUID.fromString(orderId));
+        try {
+            orderService.updateOrderState(completedOrderDto, UUID.fromString(orderId));
+        }
+        catch (ApplicationException ex){
+            log.error("Error updating order state. Exception message: {}", ex.getMessage());
+        }
     }
 
     @KafkaHandler
