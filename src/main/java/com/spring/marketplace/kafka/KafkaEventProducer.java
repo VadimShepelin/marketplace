@@ -1,6 +1,8 @@
 package com.spring.marketplace.kafka;
 
 import com.spring.marketplace.events.EventSource;
+import com.spring.marketplace.exception.ApplicationException;
+import com.spring.marketplace.utils.enums.ErrorType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -33,6 +35,7 @@ public class KafkaEventProducer {
         }
         catch (Exception ex) {
             log.error(ex.getMessage());
+            throw new ApplicationException(ErrorType.KAFKA_PRODUCER_EXCEPTION);
         }
     }
 
@@ -50,6 +53,7 @@ public class KafkaEventProducer {
         }
         catch (Exception ex) {
             log.error(ex.getMessage());
+            throw new ApplicationException(ErrorType.KAFKA_PRODUCER_EXCEPTION);
         }
     }
 
