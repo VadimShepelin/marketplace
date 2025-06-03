@@ -1,6 +1,11 @@
 spring.application:
   name: rate-service
 
+spring:
+  cloud:
+    config:
+      enabled: false
+
 server:
   port: 8080
 
