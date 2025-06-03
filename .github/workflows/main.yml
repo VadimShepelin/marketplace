@@ -1,0 +1,89 @@
+name: Marketplace CI/CD Pipeline
+
+# Build stages
+# - Build
+# - Test
+# - Deploy
+
+on:
+  push:
+    branches: ["develop"]
+  pull_request:
+    branches: ["develop"]
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - name: Get code from repository
+        uses: actions/checkout@v3
+      - name: Setup Java and Maven environment
+        uses: ./.github/actions/setup
+
+      # --- Build Marketplace API ---
+      - name: Build Marketplace Api
+        uses: ./.github/actions/build
+        with:
+          service-path: '.'
+          docker-image-name: 'api'
+
+      # --- Build Rate API ---
+      - name: Build Rate Api
+        uses: ./.github/actions/build
+        with:
+          service-path: 'rate-service'
+          docker-image-name: 'rate'
+
+      # --- Build Mail API ---
+      - name: Build Mail Api
+        uses: ./.github/actions/build
+        with:
+          service-path: 'mail-service'
+          docker-image-name: 'mail'
+
+  test:
+    runs-on: self-hosted
+    needs: build
+    steps:
+      - name: Get code from repository
+        uses: actions/checkout@v3
+      - name: Setup Java and Maven environment
+        uses: ./.github/actions/setup
+      - name: Run postgres for test
+        run: |
+             docker rm -f test postgres && docker run --name=test -d \
+             -e POSTGRES_USER=${{ secrets.POSTGRES_USERNAME_TEST }} \
+             -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD_TEST }} \
+             -e POSTGRES_DB=marketplace \
+             -p 5432:5432 postgres:latest
+      - name: Copy Json rate
+        run: mkdir -p ./resources/json && cp -R ./src/main/resources/json/* ./resources/json/
+      - name: Install Yq
+        run: snap install yq
+      - name: Update JSON path in application-test.yml
+        run: yq -i '.app.json.path = "./resources/json/dollar_exchange_rate.json"' ./src/test/resources/application-test.yml
+      - name: Run Marketplace aPI Tests
+        run: mvn test -Dspring.profiles.active=test
+      - name: Run Rate API Tests
+        run: cd rate-service && mvn test
+      - name: Run Mail API Tests
+        run: cd mail-service && mvn test
+      - name: Delete postgres test container
+        run: docker rm -f test
+
+  deploy:
+    runs-on: self-hosted
+    needs:
+      - build
+      - test
+    steps:
+      - name: Login to Docker hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Run docker container
+        run: docker-compose up -d
+      - name: Docker images prune
+        run: docker image prune -a
+

@@ -1,6 +1,9 @@
 spring.application.name: mail-service
 
 spring:
+  cloud:
+    config:
+      enabled: false
   datasource:
     password: ILin47gim
     username: postgres
