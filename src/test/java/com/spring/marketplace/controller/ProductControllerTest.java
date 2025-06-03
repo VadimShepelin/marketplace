@@ -75,8 +75,8 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("Save product have status code 200")
-    public void saveProduct_shouldHaveStatusCode200() {
+    @DisplayName("Save product have status code 201")
+    public void saveProduct_shouldHaveStatusCode201() {
         given().
                 port(port).
                 body(createProductDto()).
@@ -84,7 +84,7 @@ class ProductControllerTest {
                 when().
                 request("POST",getUrl()).
                 then().
-                statusCode(200);
+                statusCode(201);
     }
 
     @Test
