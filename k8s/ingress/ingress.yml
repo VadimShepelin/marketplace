@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+spec:
+  rules:
+    - http:
+        paths:
+        - path: /api
+          pathType: Prefix
+          backend:
+            service:
+              name: marketplace-service
+              port:
+                  number: 9000
+        - path: /rate
+          pathType: Prefix
+          backend:
+            service:
+              name: rate-service
+              port:
+                  number: 8080
+        - path: /email
+          pathType: Prefix
+          backend:
+            service:
+              name: mail-service
+              port:
+                number: 8085

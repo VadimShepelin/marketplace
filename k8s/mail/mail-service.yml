@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mail-deploy
+  labels:
+    app: mail
+spec:
+  selector:
+    matchLabels:
+      app: mail
+  template:
+    metadata:
+      labels:
+        app: mail
+    spec:
+      containers:
+        - name: mail
+          ports:
+            - containerPort: 8085
+          image: kocichca152/mail:latest
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mail-service
+  labels:
+    app: mail-service
+spec:
+  selector:
+    app: mail
+  type: NodePort
+  ports:
+    - port: 8085
+      targetPort: 8085
+      protocol: TCP
