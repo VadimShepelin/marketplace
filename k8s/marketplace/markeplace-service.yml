@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: marketplace-deployment
+  labels:
+    app: marketplace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: marketplace
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: marketplace
+    spec:
+      containers:
+        - name: marketplace
+          image: kocichca152/api:latest
+          ports:
+            - containerPort: 9000
+          imagePullPolicy: Always
+          env:
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: SPRING_DATASOURCE_URL
+                  name: marketplace-config
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: SPRING_DATASOURCE_USERNAME
+                  name: marketplace-secret
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: SPRING_DATASOURCE_PASSWORD
+                  name: marketplace-secret
+            - name: SPRING_REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: SPRING_REDIS_HOST
+                  name: marketplace-config
+            - name: SPRING_REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: SPRING_REDIS_PORT
+                  name: marketplace-config
+            - name: APP_FEIGN-CLIENT_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: APP_FEIGN-CLIENT_URL
+                  name: marketplace-config
+            - name: APP_JSON_PATH
+              valueFrom:
+                configMapKeyRef:
+                  key: APP_JSON_PATH
+                  name: marketplace-config
+            - name: SPRING_AUTOCONFIGURE_EXCLUDE
+              valueFrom:
+                configMapKeyRef:
+                  key: SPRING_AUTOCONFIGURE_EXCLUDE
+                  name: marketplace-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: marketplace-service
+  labels:
+    app: marketplace-service
+spec:
+  selector:
+    app: marketplace
+  type: NodePort
+  ports:
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+

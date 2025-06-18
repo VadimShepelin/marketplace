@@ -67,8 +67,6 @@ services:
     ports:
       - "8082:8082"
     restart: always
-    env_file:
-      - ./mail-service/docker.env
 
 networks:
   backend:
